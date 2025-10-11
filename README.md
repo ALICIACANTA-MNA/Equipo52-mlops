@@ -371,6 +371,7 @@ Equipo52_MLOPS/
     └── (documentación adicional)
 
 
+
 Equipo52_obesity-mlops/
 ├── README.md                 <- The top-level README for developers using this project.
 ├── data/                     <- (no versionar raw directo; usar DVC)
