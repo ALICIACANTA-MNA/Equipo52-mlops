@@ -33,4 +33,4 @@ dist/
 *.egg-info/
 
 # Archivos de datos grandes 
-data/
+/data
