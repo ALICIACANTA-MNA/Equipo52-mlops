@@ -1,0 +1,322 @@
+# Configuración del Model Registry para gestión avanzada de modelos ML
+# Configuración para MLflow Model Registry con governance y auto-promoción
+
+# Configuración general del registry
+registry:
+  name: "obesity_prediction_registry"
+  description: "Model registry for obesity prediction MLOps pipeline"
+  default_model_name: "obesity_prediction_model"
+  
+  # Gestión de versiones
+  versioning:
+    auto_version: true
+    version_prefix: "v"
+    semantic_versioning: false  # true para usar semver (major.minor.patch)
+    
+  # Retención de versiones
+  retention:
+    max_versions_per_model: 10
+    max_versions_per_stage: 3
+    auto_archive_old_versions: true
+    archive_after_days: 90
+
+# Configuración de auto-promoción
+auto_promotion:
+  enabled: true
+  
+  # Umbrales para promoción automática a Staging
+  staging_thresholds:
+    accuracy: 0.80
+    f1_score: 0.75
+    precision: 0.70
+    recall: 0.70
+    roc_auc: 0.75
+    
+  # Umbrales más estrictos para Production
+  production_thresholds:
+    accuracy: 0.85
+    f1_score: 0.80
+    precision: 0.80
+    recall: 0.75
+    roc_auc: 0.80
+    
+  # Umbrales personalizados por modelo
+  model_specific_thresholds:
+    obesity_prediction_model:
+      staging:
+        accuracy: 0.82
+        f1_score: 0.78
+      production:
+        accuracy: 0.87
+        f1_score: 0.83
+        
+  # Reglas de promoción
+  promotion_rules:
+    require_staging_first: true  # Requerir pasar por Staging antes de Production
+    staging_minimum_days: 3     # Días mínimos en Staging antes de Production
+    require_manual_approval_for_production: false
+    
+  # Comparación con modelo actual
+  current_model_comparison:
+    enabled: true
+    primary_metric: "f1_score"
+    minimum_improvement: 0.01  # 1% mejora mínima
+    secondary_metrics:
+      - "accuracy"
+      - "precision"
+      - "recall"
+    
+  # Cooldown para promociones
+  promotion_cooldown:
+    enabled: true
+    hours_between_promotions: 24
+    
+# Configuración de governance y aprobaciones
+governance:
+  # Requerir aprobación manual
+  approval_required: false  # Cambiar a true en entornos críticos
+  
+  # Roles y permisos
+  roles:
+    data_scientist:
+      can_register: true
+      can_promote_to_staging: true
+      can_promote_to_production: false
+    ml_engineer:
+      can_register: true
+      can_promote_to_staging: true  
+      can_promote_to_production: true
+    admin:
+      can_register: true
+      can_promote_to_staging: true
+      can_promote_to_production: true
+      can_archive: true
+      can_delete: true
+      
+  # Workflow de aprobación
+  approval_workflow:
+    require_two_approvers: false
+    auto_approve_if_tests_pass: true
+    approval_timeout_hours: 72
+    
+  # Auditoría
+  audit:
+    log_all_changes: true
+    require_change_reason: true
+    log_model_downloads: true
+    log_prediction_requests: false  # Para evitar overhead
+
+# Configuración de comparación de modelos
+model_comparison:
+  # Métrica principal para comparación
+  primary_metric: "f1_score"
+  
+  # Métricas secundarias
+  secondary_metrics:
+    - "accuracy"
+    - "precision" 
+    - "recall"
+    - "roc_auc"
+    
+  # Configuración de A/B testing
+  ab_testing:
+    enabled: false  # Habilitar cuando esté implementado
+    default_traffic_split: 0.1  # 10% tráfico para modelo nuevo
+    ramp_up_strategy: "gradual"  # gradual, immediate
+    evaluation_period_days: 7
+    
+  # Métricas de negocio (para futuro)
+  business_metrics:
+    track_prediction_accuracy: true
+    track_response_time: true
+    track_model_drift: true
+
+# Configuración de deployment
+deployment:
+  # Estrategias de deployment
+  strategies:
+    default: "direct"  # direct, canary, blue_green, a_b_test
+    
+  # Configuración de canary deployment
+  canary:
+    initial_traffic_percentage: 5
+    success_criteria:
+      error_rate_threshold: 0.02
+      latency_threshold_ms: 500
+      minimum_requests: 100
+    ramp_up_schedule:
+      - percentage: 5
+        duration_minutes: 30
+      - percentage: 25
+        duration_minutes: 60
+      - percentage: 50
+        duration_minutes: 120
+      - percentage: 100
+        duration_minutes: 0
+        
+  # Configuración de rollback automático
+  auto_rollback:
+    enabled: true
+    triggers:
+      error_rate_threshold: 0.10
+      latency_threshold_ms: 2000
+      prediction_accuracy_drop: 0.05
+    cooldown_minutes: 30
+
+# Configuración de monitoreo post-deployment
+monitoring:
+  # Métricas a monitorear
+  track_metrics:
+    - "prediction_accuracy"
+    - "response_time"
+    - "error_rate"
+    - "throughput"
+    - "model_drift"
+    
+  # Alertas
+  alerts:
+    enabled: true
+    channels:
+      - "slack"
+      - "email"
+      
+  # Drift detection
+  drift_detection:
+    enabled: true
+    methods:
+      - "statistical"
+      - "model_based"
+    check_frequency_hours: 24
+    alert_threshold: 0.1
+    
+  # Performance monitoring
+  performance_monitoring:
+    enabled: true
+    baseline_period_days: 7
+    alert_on_degradation: true
+    degradation_threshold: 0.05
+
+# Configuración de testing
+testing:
+  # Tests automáticos antes de promoción
+  automated_tests:
+    enabled: true
+    test_suites:
+      - "unit_tests"
+      - "integration_tests"
+      - "model_validation_tests"
+      
+  # Configuración de datos de test
+  test_data:
+    validation_set_path: "data/test/validation_set.csv"
+    holdout_set_path: "data/test/holdout_set.csv"
+    synthetic_data_enabled: false
+    
+  # Criterios de aceptación
+  acceptance_criteria:
+    minimum_test_coverage: 0.90
+    all_tests_must_pass: true
+    performance_regression_threshold: 0.05
+
+# Configuración de backup y recovery
+backup:
+  enabled: true
+  frequency: "daily"
+  retention_days: 30
+  backup_location: "${MODEL_BACKUP_LOCATION}"
+  
+  # Backup automático antes de promociones críticas
+  backup_before_production: true
+  backup_before_rollback: true
+
+# Configuración de integración
+integrations:
+  # MLflow
+  mlflow:
+    tracking_uri: "${MLFLOW_TRACKING_URI}"
+    registry_uri: "${MLFLOW_REGISTRY_URI}" 
+    experiment_name: "obesity_prediction"
+    artifact_location: "${MLFLOW_ARTIFACT_LOCATION}"
+    
+  # CI/CD
+  cicd:
+    enabled: true
+    trigger_on_promotion: true
+    pipeline_template: "model_deployment_pipeline"
+    
+  # Notification services
+  notifications:
+    slack:
+      enabled: false
+      webhook_url: "${SLACK_WEBHOOK_URL}"
+      channel: "#mlops-alerts"
+    email:
+      enabled: true
+      smtp_server: "${SMTP_SERVER}"
+      recipients:
+        - "mlops-team@company.com"
+        - "data-science-team@company.com"
+
+# Configuración de logging
+logging:
+  level: "INFO"
+  format: "json"
+  
+  # Logs específicos del registry
+  log_model_registrations: true
+  log_stage_transitions: true
+  log_model_comparisons: true
+  log_promotion_requests: true
+  
+  # Archivos de log
+  log_files:
+    registry_operations: "logs/registry/operations.log"
+    model_promotions: "logs/registry/promotions.log"
+    approval_workflows: "logs/registry/approvals.log"
+
+# Configuración de métricas específicas por modelo
+model_specific_config:
+  obesity_prediction_model:
+    # Métricas de evaluación específicas
+    evaluation_metrics:
+      - "accuracy"
+      - "precision"
+      - "recall"
+      - "f1_score"
+      - "roc_auc"
+      - "confusion_matrix"
+      - "classification_report"
+      
+    # Features importantes para monitoreo
+    important_features:
+      - "BMI"
+      - "Age"
+      - "physical_activity_level"
+      - "eating_habits_score"
+      
+    # Configuración de drift detection específica
+    drift_detection:
+      reference_period_days: 30
+      features_to_monitor:
+        - "BMI"
+        - "Age"
+        - "Height"
+        - "Weight"
+      statistical_tests:
+        - "ks_test"
+        - "chi_square"
+        
+    # SLA específicos
+    sla:
+      max_response_time_ms: 200
+      availability: 99.9
+      max_error_rate: 0.01
+
+# Variables de entorno requeridas
+environment_variables:
+  MLFLOW_TRACKING_URI: "https://mlflow-server.company.com"
+  MLFLOW_REGISTRY_URI: "https://mlflow-server.company.com"
+  MLFLOW_ARTIFACT_LOCATION: "s3://mlops-artifacts/obesity-prediction"
+  MODEL_BACKUP_LOCATION: "s3://mlops-backups/models"
+  SLACK_WEBHOOK_URL: "https://hooks.slack.com/..."
+  SMTP_SERVER: "smtp.company.com"

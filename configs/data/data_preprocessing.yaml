@@ -1,0 +1,121 @@
+# Configuración de preprocesamiento de datos
+# Define parámetros para transformación y preparación de datos
+
+# Feature Engineering
+feature_engineering:
+  # Crear Body Mass Index
+  create_bmi: true
+  
+  # Crear categorías de BMI
+  create_bmi_category: true
+  
+  # Crear ratio altura/peso
+  create_height_weight_ratio: true
+  
+  # Crear score de hábitos alimenticios
+  create_eating_habits_score: true
+  
+  # Crear score de actividad física
+  create_activity_score: true
+  
+  # Crear features de interacción
+  create_interactions: true
+  
+  # Crear features binarias adicionales
+  create_binary_features: true
+
+# Configuración de encoding para variables categóricas
+encoding:
+  # Método de encoding: 'onehot', 'label', 'target'
+  method: "onehot"
+  
+  # Para OneHot: drop first category to avoid multicollinearity
+  drop_first: "first"
+  
+  # Manejar categorías desconocidas
+  handle_unknown: "ignore"
+
+# Configuración de escalado para variables numéricas
+scaling:
+  # Método de escalado: 'standard', 'robust', 'minmax'
+  method: "standard"
+  
+  # Parámetros específicos
+  with_mean: true
+  with_std: true
+
+# Configuración de imputación de valores faltantes
+imputation:
+  # Estrategia para variables numéricas: 'mean', 'median', 'most_frequent', 'knn'
+  numeric_strategy: "median"
+  
+  # Estrategia para variables categóricas: 'most_frequent', 'constant'
+  categorical_strategy: "most_frequent"
+  
+  # Para KNN imputer
+  knn_neighbors: 5
+
+# División de datos train/test
+train_test_split:
+  # Proporción de datos para test
+  test_size: 0.2
+  
+  # Semilla para reproducibilidad
+  random_state: 42
+  
+  # Estratificar por target variable
+  stratify: true
+
+# Manejo de desbalance de clases
+class_balance:
+  # Aplicar técnicas de balanceo
+  apply: false
+  
+  # Método: 'oversample', 'undersample', 'smote'
+  method: "oversample"
+  
+  # Semilla para reproducibilidad
+  random_state: 42
+
+# Configuración de encoding para variable target
+target_encoding:
+  # Aplicar encoding a la variable target
+  encode: true
+  
+  # Método de encoding para target
+  method: "label"
+
+# Validación de preprocesamiento
+validation:
+  # Verificar que no hay valores NaN después del preprocesamiento
+  check_no_nulls: true
+  
+  # Verificar que todas las features son numéricas después del preprocessing
+  check_all_numeric: true
+  
+  # Verificar rangos esperados
+  check_feature_ranges: true
+
+# Configuración de features a excluir
+feature_exclusion:
+  # Excluir features con alta correlación
+  exclude_high_correlation: true
+  correlation_threshold: 0.95
+  
+  # Excluir features con baja varianza
+  exclude_low_variance: true
+  variance_threshold: 0.01
+
+# Configuración de persistencia
+persistence:
+  # Directorio base para artefactos
+  artifacts_dir: "artifacts/preprocessing"
+  
+  # Guardar pipeline de preprocesamiento
+  save_pipeline: true
+  
+  # Guardar estadísticas de features
+  save_feature_stats: true
+  
+  # Guardar mapeos de encoding
+  save_encodings: true

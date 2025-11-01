@@ -1,0 +1,214 @@
+# Model Training Configuration
+# Configuración para entrenamiento de modelos de machine learning
+
+# Configuración general de entrenamiento
+training:
+  # Nombre del experimento en MLflow
+  experiment_name: "obesity_prediction_v2"
+  
+  # Modelos a entrenar (debe coincidir con claves en 'models')
+  models:
+    - "random_forest"
+    - "gradient_boosting"
+    - "logistic_regression"
+  
+  # Cross-validation folds
+  cv_folds: 5
+  
+  # Métrica principal para selección de modelo
+  primary_metric: "f1_weighted"
+  
+  # Semilla para reproducibilidad
+  random_state: 42
+
+# Configuración de modelos
+models:
+  random_forest:
+    params:
+      n_estimators: 300
+      max_depth: 12
+      min_samples_split: 2
+      min_samples_leaf: 1
+      class_weight: "balanced"
+      random_state: 42
+      n_jobs: -1
+    
+  gradient_boosting:
+    params:
+      n_estimators: 200
+      max_depth: 8
+      learning_rate: 0.1
+      subsample: 0.8
+      random_state: 42
+    
+  logistic_regression:
+    params:
+      class_weight: "balanced"
+      max_iter: 1000
+      random_state: 42
+      solver: "lbfgs"
+    
+  svm:
+    params:
+      kernel: "rbf"
+      class_weight: "balanced"
+      random_state: 42
+      probability: true  # Para AUC calculation
+    
+  knn:
+    params:
+      n_neighbors: 5
+      weights: "uniform"
+      metric: "minkowski"
+
+# Configuración de hyperparameter tuning
+hyperparameter_tuning:
+  # Habilitar hyperparameter tuning
+  enabled: false
+  
+  # Método de búsqueda: 'grid', 'random'
+  search_method: "grid"
+  
+  # Número de iteraciones para random search
+  n_iter: 50
+  
+  # Cross-validation folds para tuning
+  cv_folds: 3
+  
+  # Métrica para optimizar
+  scoring: "f1_weighted"
+  
+  # Número de trabajos paralelos
+  n_jobs: -1
+  
+  # Grillas de parámetros por modelo
+  models:
+    random_forest:
+      n_estimators: [200, 300, 400]
+      max_depth: [8, 12, 16, null]
+      min_samples_split: [2, 5, 10]
+      min_samples_leaf: [1, 2, 4]
+    
+    gradient_boosting:
+      n_estimators: [100, 200, 300]
+      max_depth: [4, 6, 8]
+      learning_rate: [0.05, 0.1, 0.2]
+      subsample: [0.7, 0.8, 0.9]
+    
+    logistic_regression:
+      C: [0.1, 1.0, 10.0]
+      solver: ["lbfgs", "liblinear"]
+
+# Configuración de métricas
+metrics:
+  # Métricas principales a calcular
+  primary_metrics:
+    - "accuracy"
+    - "f1_weighted"
+    - "f1_macro"
+    - "precision_weighted"
+    - "precision_macro"
+    - "recall_weighted"
+    - "recall_macro"
+  
+  # Métricas adicionales (si aplica)
+  additional_metrics:
+    - "auc_weighted"  # Solo para modelos con predict_proba
+  
+  # Configuración de cross-validation para métricas
+  cv_metrics:
+    enabled: true
+    cv_folds: 5
+    scoring: "f1_weighted"
+
+# Configuración de artefactos
+artifacts:
+  # Directorio base para artefactos
+  base_dir: "artifacts/training"
+  
+  # Tipos de artefactos a generar
+  generate:
+    classification_report: true
+    confusion_matrix: true
+    feature_importance: true
+    metrics_summary: true
+    model_comparison: true
+  
+  # Configuración de plots
+  plots:
+    dpi: 300
+    format: "png"
+    figsize: [10, 8]
+    style: "whitegrid"
+
+# Configuración de model registry
+model_registry:
+  # Registrar modelos automáticamente en MLflow
+  auto_register: true
+  
+  # Prefijo para nombres de modelos registrados
+  model_name_prefix: "obesity_prediction"
+  
+  # Tags por defecto para modelos
+  default_tags:
+    task: "classification"
+    domain: "healthcare"
+    dataset: "obesity_estimation"
+  
+  # Configuración de stages
+  stages:
+    # Promover automáticamente el mejor modelo
+    auto_promote_best: true
+    
+    # Stage inicial para nuevos modelos
+    initial_stage: "Staging"
+
+# Configuración de early stopping (para modelos que lo soporten)
+early_stopping:
+  enabled: false
+  patience: 10
+  min_delta: 0.001
+  restore_best_weights: true
+
+# Configuración de logging
+logging:
+  # Nivel de detalle en logs
+  level: "INFO"
+  
+  # Log de parámetros de modelo
+  log_model_params: true
+  
+  # Log de métricas de entrenamiento
+  log_training_metrics: true
+  
+  # Log de artefactos automáticamente
+  log_artifacts: true
+
+# Configuración de integración con Model Registry
+registry:
+  # Registrar automáticamente el mejor modelo tras entrenamiento
+  auto_register_best_model: true
+  
+  # Nombre base para modelos registrados
+  model_name_template: "obesity_prediction_{model_name}"
+  
+  # Tags adicionales para modelos registrados
+  registry_tags:
+    environment: "development"
+    team: "mlops"
+    project: "obesity-prediction"
+    automated: "true"
+    
+  # Configuración de promoción automática tras registro
+  auto_promotion:
+    enabled: true
+    
+    # Promover a Staging si cumple umbrales
+    promote_to_staging: true
+    staging_threshold:
+      f1_weighted: 0.75
+      accuracy: 0.80
+    
+    # NO promover automáticamente a Production desde training
+    # (requerir evaluación manual adicional)
+    promote_to_production: false

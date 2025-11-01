@@ -1,0 +1,185 @@
+# =============================================================================
+# DVC Pipeline Configuration - Based on Project Technical Library
+# =============================================================================
+#
+#  TECHNICAL FOUNDATION - Primary Sources (Available in docs/):
+#
+# 1. "ML Engineering in Action" - Ben Wilson, Manning (2022)
+#    Chapter 8: "Pipeline Orchestration" & Chapter 9: "Workflow Management"
+#    Implementation: Command Pattern with python -m module resolution
+#
+# 2. "ML Design Patterns" - Lakshmanan, Robinson, Munn, O'Reilly (2020)  
+#    Pattern 12: "Workflow Pipeline" & Pattern 13: "Feature Store"
+#    Implementation: DAG structure with microservices architecture
+#
+# 3. "Introducing MLOps" - Treveil et al., O'Reilly (2020)
+#    Chapter 7: "Pipeline Automation" & Chapter 8: "Infrastructure as Code"
+#    Implementation: Dependency injection and artifact tracking
+#
+# 4. "Designing ML Systems" - Chip Huyen, O'Reilly (2022)
+#    Chapter 4: "Training Data" & Chapter 8: "Data Distribution Shifts"
+#    Implementation: Data lineage and reproducible pipeline stages
+#
+# ARCHITECTURAL PATTERNS APPLIED:
+# DAG Pattern (Lakshmanan et al., Workflow Pipeline - "Acyclic dependency graph")
+# Command Pattern (Wilson, Chapter 8 - "Encapsulated execution units")
+# Dependency Injection (Treveil et al., Chapter 7 - "External dependency management")
+# Microservices (Huyen, Chapter 4 - "Independent, loosely-coupled stages")
+#
+# ARQUITECTURA DVC PARA ORQUESTACIÓN DE PIPELINES:
+# ┌─────────────────────────────────────────────────────────────────────────┐
+# │                    DVC PIPELINE ORCHESTRATION                          │
+# │                                                                         │
+# │  dvc.yaml (Pipeline Definition)                                         │
+# │      ↓                                                                  │
+# │  Pipeline Stages (7 etapas secuenciales)                               │
+# │      ↓                                                                  │
+# │  dvc.lock (Estado actual de ejecución)                                 │
+# │      ↓                                                                  │
+# │  .dvc/cache (Almacén de versiones)                                     │
+# │                                                                         │
+# │  FLUJO DE DATOS:                                                        │
+# │  Raw Data → Validation → Preprocessing → Feature Engineering           │
+# │      ↓           ↓            ↓               ↓                         │
+# │  Model Training → Evaluation → Registration                            │
+# │                                                                         │
+# │  CONTROL DE VERSIONES:                                                  │
+# │  • Hash MD5 por cada archivo/etapa                                     │
+# │  • Seguimiento automático de dependencias                              │
+# │  • Reutilización inteligente de resultados                             │
+# │  • Reproducibilidad garantizada                                        │
+# └─────────────────────────────────────────────────────────────────────────┘
+# =============================================================================
+
+# PIPELINE STAGES DEFINITION
+# Each stage represents a microservice in the ML pipeline
+stages:
+  # STAGE 1: DATA INGESTION
+  # Purpose: Download and acquire raw data from external sources
+  # Pattern: Extract-Load (EL) with validation
+  # Reference: "Designing Data-Intensive Applications" - Kleppmann (Ch. 10)
+  data_ingestion:
+    cmd: python -m src.data.data_ingestion
+    deps:
+      - src/data/data_ingestion.py          # Source code dependency
+      - configs/data/data_config.yaml       # Configuration dependency
+    params:
+      - data.raw_data_url                   # External parameter injection
+      - data.raw_data_path                  # Path parameter injection
+    outs:
+      - data/raw/ObesityDataSet_raw_and_data_sinthetic.csv  # Immutable raw artifact
+
+  # STAGE 2: DATA VALIDATION  
+  # Purpose: Validate data quality, schema, and statistical properties
+  # Pattern: Data Quality Gate with statistical profiling
+  # Reference: "The ML Test Score" - Breck et al. (Google, 2017)
+  data_validation:
+    cmd: python -m src.data.data_validation
+    deps:
+      - src/data/data_validation.py                           # Validation logic
+      - data/raw/ObesityDataSet_raw_and_data_sinthetic.csv   # Raw data input
+      - configs/data/data_validation.yaml                     # Validation rules
+    outs:
+      - data/interim/obesity_estimation_original.csv          # Validated artifact
+
+  # STAGE 3: DATA PREPROCESSING
+  # Purpose: Clean, transform, and split data for ML training
+  # Pattern: Transform with train/test isolation
+  # Reference: "Hands-On Machine Learning" - Géron (Ch. 2)
+  data_preprocessing:
+    cmd: python -m src.data.data_preprocessing
+    deps:
+      - src/data/data_preprocessing.py                    # Preprocessing logic
+      - data/interim/obesity_estimation_original.csv      # Validated input
+      - configs/data/data_config.yaml                     # Data configuration
+    params:
+      - data_processing.test_size                         # Split ratio
+      - data_processing.validation_size                   # Validation ratio  
+      - data_processing.random_state                      # Reproducibility seed
+      - data_processing.target_column                     # Target variable
+      - feature_engineering                               # Feature config
+    outs:
+      - data/processed/train_data.csv                     # Training set
+      - data/processed/test_data.csv                      # Test set
+
+  # STAGE 4: FEATURE ENGINEERING
+  # Purpose: Transform features for optimal ML model performance
+  # Pattern: Feature Pipeline with preprocessing fit/transform
+  # Reference: "Feature Engineering for Machine Learning" - Zheng & Casari
+  feature_engineering:
+    cmd: python -m src.features.feature_engineering
+    deps:
+      - src/features/feature_engineering.py              # Feature engineering logic
+      - data/processed/train_data.csv                    # Training data
+      - data/processed/test_data.csv                     # Test data
+      - configs/data/data_config.yaml                    # Feature configuration
+    params:
+      - feature_engineering                              # Feature parameters
+    outs:
+      - data/processed/X_train_processed.csv             # Processed training features
+      - data/processed/X_test_processed.csv              # Processed test features
+      - data/processed/y_train.csv                       # Training targets
+      - data/processed/y_test.csv                        # Test targets
+
+  # STAGE 5: MODEL TRAINING
+  # Purpose: Train ML model with hyperparameter optimization
+  # Pattern: Training with experiment tracking and model versioning
+  # Reference: "Machine Learning Engineering" - Burkov (Ch. 6)
+  model_training:
+    cmd: python -m src.models.train
+    deps:
+      - src/models/train.py                              # Training algorithm
+      - data/processed/X_train_processed.csv             # Training features
+      - data/processed/y_train.csv                       # Training targets
+      - configs/model/model_config.yaml                  # Model configuration
+      - configs/mlflow/mlflow_config.yaml                # Experiment tracking config
+    params:
+      - model_training                                   # Training parameters
+      - mlflow                                           # Tracking parameters
+    outs:
+      - models/best_model.joblib                         # Serialized trained model
+    metrics:
+      - metrics/train_metrics.json:                      # Training performance metrics
+          cache: false                                   # Always fresh metrics
+
+  # STAGE 6: MODEL EVALUATION
+  # Purpose: Evaluate model performance on holdout test set
+  # Pattern: Unbiased evaluation with comprehensive metrics
+  # Reference: "Model Evaluation, Model Selection, and Algorithm Selection" - Raschka
+  model_evaluation:
+    cmd: python -m src.models.evaluate
+    deps:
+      - src/models/evaluate.py                           # Evaluation logic
+      - models/best_model.joblib                         # Trained model artifact
+      - data/processed/X_test_processed.csv              # Test features (holdout)
+      - data/processed/y_test.csv                        # Test targets (holdout)
+      - configs/model/model_config.yaml                  # Model configuration
+    params:
+      - evaluation                                       # Evaluation parameters
+    outs:
+      - metrics/classification_report.json               # Detailed classification metrics
+      - metrics/confusion_matrix.png                     # Confusion matrix visualization
+      - metrics/feature_importance.png                   # Feature importance plot
+    metrics:
+      - metrics/evaluation_metrics.json:                 # Structured evaluation metrics
+          cache: false                                   # Always fresh evaluation
+
+  # STAGE 7: MODEL REGISTRATION
+  # Purpose: Register model in MLflow registry for deployment
+  # Pattern: Model registry with versioning and metadata
+  # Reference: "MLOps: Continuous Delivery and Automation" - Google Cloud AI
+  model_registration:
+    cmd: python -m src.models.model_registration
+    deps:
+      - src/models/model_registration.py                 # Registration logic
+      - models/best_model.joblib                         # Model to register
+      - metrics/evaluation_metrics.json                  # Model performance metrics
+      - configs/mlflow/mlflow_config.yaml                # MLflow registry config
+    params:
+      - mlflow                                           # Registry parameters
+      - evaluation                                       # Performance thresholds
+    outs:
+      - models/registered_model_info.json                # Registry metadata
+    metrics:
+      - metrics/comparison_metrics.json:                 # Cross-validation metrics
+          cache: false                                   # Always fresh comparison

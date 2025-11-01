@@ -1,0 +1,148 @@
+# Configuración de validación de datos
+# Especifica reglas de validación para el pipeline de datos
+
+# Reglas de validación
+validation_rules:
+  # Validación de esquema
+  schema:
+    required_columns:
+      - Gender
+      - Age
+      - Height
+      - Weight
+      - family_history_with_overweight
+      - FAVC
+      - FCVC
+      - NCP
+      - CAEC
+      - SMOKE
+      - CH2O
+      - SCC
+      - FAF
+      - TUE
+      - CALC
+      - MTRANS
+      - NObeyesdad
+    
+    column_types:
+      Gender: object
+      Age: number
+      Height: number
+      Weight: number
+      family_history_with_overweight: object
+      FAVC: object
+      FCVC: number
+      NCP: number
+      CAEC: object
+      SMOKE: object
+      CH2O: number
+      SCC: object
+      FAF: number
+      TUE: number
+      CALC: object
+      MTRANS: object
+      NObeyesdad: object
+
+  # Checks de calidad de datos
+  quality_checks:
+    Age:
+      min: 14
+      max: 61
+    
+    Height:
+      min: 1.45
+      max: 1.98
+    
+    Weight:
+      min: 39
+      max: 173
+    
+    FCVC:
+      min: 1
+      max: 3
+    
+    NCP:
+      min: 1
+      max: 4
+    
+    CH2O:
+      min: 1
+      max: 3
+    
+    FAF:
+      min: 0
+      max: 3
+    
+    TUE:
+      min: 0
+      max: 2
+    
+    Gender:
+      valid_values: ["Female", "Male"]
+    
+    family_history_with_overweight:
+      valid_values: ["yes", "no"]
+    
+    FAVC:
+      valid_values: ["yes", "no"]
+    
+    CAEC:
+      valid_values: ["no", "Sometimes", "Frequently", "Always"]
+    
+    SMOKE:
+      valid_values: ["yes", "no"]
+    
+    SCC:
+      valid_values: ["yes", "no"]
+    
+    CALC:
+      valid_values: ["no", "Sometimes", "Frequently", "Always"]
+    
+    MTRANS:
+      valid_values: ["Walking", "Bike", "Automobile", "Motorbike", "Public_Transportation"]
+    
+    NObeyesdad:
+      valid_values: 
+        - "Insufficient_Weight"
+        - "Normal_Weight" 
+        - "Overweight_Level_I"
+        - "Overweight_Level_II"
+        - "Obesity_Type_I"
+        - "Obesity_Type_II"
+        - "Obesity_Type_III"
+
+# Configuración de detección de drift
+drift_detection:
+  # Dataset de referencia para comparar drift
+  reference_dataset: "src/data/processed/dataset_limpio.csv"
+  
+  # Umbral para considerar drift significativo
+  monitoring_threshold: 0.05
+  
+  # Tests estadísticos a aplicar
+  statistical_tests:
+    - "ks_test"      # Kolmogorov-Smirnov para datos numéricos
+    - "chi2_test"    # Chi-squared para datos categóricos
+    - "psi"          # Population Stability Index
+  
+  # Configuración por tipo de datos
+  numerical_tests:
+    - "ks_test"
+    - "psi"
+  
+  categorical_tests:
+    - "chi2_test"
+
+# Configuración de reportes
+reporting:
+  # Incluir estadísticas descriptivas
+  include_statistics: true
+  
+  # Incluir visualizaciones en el reporte
+  include_plots: false
+  
+  # Formato de salida
+  output_format: "json"
+  
+  # Directorio de reportes
+  reports_dir: "reports/data_validation"

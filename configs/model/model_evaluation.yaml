@@ -1,0 +1,202 @@
+# Model Evaluation Configuration
+# Configuración para evaluación de modelos de machine learning
+
+# Configuración general de evaluación
+evaluation:
+  # Directorio base para artefactos de evaluación
+  artifacts_dir: "artifacts/evaluation"
+  
+  # Generar reportes detallados
+  generate_detailed_reports: true
+  
+  # Incluir análisis de fairness
+  include_fairness_analysis: false
+
+# Configuración de métricas
+metrics:
+  # Métricas principales para clasificación
+  primary_metrics:
+    - "accuracy"
+    - "f1_weighted" 
+    - "f1_macro"
+    - "precision_weighted"
+    - "precision_macro"
+    - "recall_weighted"
+    - "recall_macro"
+  
+  # Métricas adicionales (requieren probabilidades)
+  probability_metrics:
+    - "auc_weighted"
+    - "auc_macro"
+  
+  # Configuración de umbrales de rendimiento
+  performance_thresholds:
+    accuracy: 0.7
+    f1_score: 0.7
+    precision: 0.7
+    recall: 0.7
+    auc: 0.8
+    min_support: 10
+    imbalance_ratio: 10.0
+
+# Configuración de cross-validation
+cross_validation:
+  # Habilitar cross-validation en evaluación
+  enabled: true
+  
+  # Número de folds
+  cv_folds: 5
+  
+  # Métricas para cross-validation
+  scoring:
+    - "f1_weighted"
+    - "accuracy"
+    - "precision_weighted"
+    - "recall_weighted"
+  
+  # Incluir scores de entrenamiento
+  return_train_score: true
+  
+  # Estratificación
+  stratified: true
+
+# Configuración de plots y visualizaciones
+plots:
+  # Configuración general
+  style: "whitegrid"
+  figsize: [10, 8]
+  dpi: 300
+  format: "png"
+  
+  # Plots a generar
+  generate:
+    confusion_matrix: true
+    confusion_matrix_normalized: true
+    class_metrics: true
+    roc_curves: true
+    precision_recall_curves: true
+    prediction_confidence: true
+    feature_importance: true
+    calibration_curves: false
+  
+  # Configuración específica por plot
+  confusion_matrix:
+    cmap: "Blues"
+    annot: true
+    fmt: "d"
+  
+  roc_curves:
+    include_micro_average: true
+    include_macro_average: true
+  
+  class_metrics:
+    top_n_features: 20
+    orientation: "horizontal"
+
+# Análisis de confianza en predicciones
+confidence_analysis:
+  # Umbrales de confianza
+  low_confidence_threshold: 0.6
+  high_confidence_threshold: 0.9
+  
+  # Análisis por percentiles
+  confidence_percentiles: [10, 25, 50, 75, 90]
+  
+  # Generar plots de confianza
+  generate_confidence_plots: true
+
+# Análisis de fairness (experimental)
+fairness_analysis:
+  # Habilitar análisis de fairness
+  enabled: false
+  
+  # Atributos protegidos (si están disponibles)
+  protected_attributes: []
+  
+  # Métricas de fairness
+  fairness_metrics:
+    - "demographic_parity"
+    - "equalized_odds"
+    - "equal_opportunity"
+  
+  # Umbrales de fairness
+  fairness_thresholds:
+    demographic_parity: 0.1
+    equalized_odds: 0.1
+
+# Comparación entre modelos
+model_comparison:
+  # Habilitar comparación automática
+  enabled: true
+  
+  # Métrica principal para ranking
+  ranking_metric: "f1_weighted"
+  
+  # Incluir tests estadísticos
+  statistical_tests: true
+  
+  # Tests a realizar
+  tests:
+    - "wilcoxon"  # Para comparar rendimiento de modelos
+    - "mcnemar"   # Para comparar predicciones
+  
+  # Nivel de significancia
+  alpha: 0.05
+
+# Configuración de reportes
+reporting:
+  # Formato de reportes
+  formats:
+    - "json"
+    - "html"
+  
+  # Incluir en reporte
+  include:
+    model_summary: true
+    detailed_metrics: true
+    confusion_matrices: true
+    class_analysis: true
+    confidence_analysis: true
+    cross_validation_results: true
+    performance_issues: true
+  
+  # Configuración de reporte HTML
+  html_report:
+    template: "detailed"
+    include_plots: true
+    plot_format: "png"
+
+# Configuración de alertas
+alerts:
+  # Habilitar alertas por bajo rendimiento
+  enabled: true
+  
+  # Umbrales para alertas
+  thresholds:
+    min_accuracy: 0.6
+    min_f1_weighted: 0.6  
+    max_low_confidence_percentage: 30.0
+    min_cross_val_stability: 0.05  # Máxima desviación estándar en CV
+  
+  # Tipos de alertas
+  alert_types:
+    - "low_performance"
+    - "high_variance"
+    - "class_imbalance_issues"
+    - "low_confidence_predictions"
+
+# Configuración de MLflow integration
+mlflow_integration:
+  # Log métricas automáticamente
+  auto_log_metrics: true
+  
+  # Log artefactos automáticamente 
+  auto_log_artifacts: true
+  
+  # Tags por defecto
+  default_tags:
+    evaluation_stage: "test"
+    evaluation_type: "comprehensive"
+  
+  # Comparar con modelos existentes
+  compare_with_registered: true

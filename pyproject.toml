@@ -1,0 +1,46 @@
+[tool.pytest.ini_options]
+# Configuración principal de pytest
+minversion = "7.0"
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
+# Marcadores personalizados
+markers = [
+    "unit: Unit tests - fast, isolated tests",
+    "integration: Integration tests - test component interactions",
+    "api: API tests - test endpoints and responses", 
+    "data: Data validation tests - test data quality and schemas",
+    "slow: Slow tests - tests that take more than 5 seconds",
+    "ml: Machine learning tests - model training and evaluation",
+    "smoke: Smoke tests - basic functionality validation"
+]
+
+# Configuración de cobertura
+addopts = [
+    "--strict-markers",
+    "--strict-config", 
+    "--verbose",
+    "--tb=short",
+    "--cov=src",
+    "--cov-report=term-missing",
+    "--cov-report=html:tests/reports/coverage",
+    "--cov-report=xml:tests/reports/coverage.xml",
+    "--cov-branch",
+    "--cov-fail-under=80",
+    "--junitxml=tests/reports/junit.xml"
+]
+
+# Filtros de warnings
+filterwarnings = [
+    "ignore::UserWarning",
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning"
+]
+
+# Configuración para tests paralelos
+log_cli = true
+log_cli_level = "INFO"
+log_cli_format = "%(asctime)s [%(levelname)8s] %(name)s: %(message)s"
+log_cli_date_format = "%Y-%m-%d %H:%M:%S"

@@ -1,0 +1,176 @@
+# =============================================================================
+# API CONFIGURATION - PRODUCTION-READY SETTINGS
+# =============================================================================
+#
+# Configuración completa para API de predicción de obesidad
+# Optimizada para diferentes entornos: development, staging, production
+#
+# Referencias:
+# - FastAPI Production Settings: https://fastapi.tiangolo.com/deployment/
+# - Uvicorn Configuration: https://www.uvicorn.org/settings/
+# - Security Best Practices: OWASP API Security Top 10
+# =============================================================================
+
+# Configuración del servidor
+server:
+  host: "0.0.0.0"
+  port: 8000
+  workers: 4
+  timeout: 300
+  keepalive: 30
+  max_requests: 1000
+  max_requests_jitter: 50
+  preload_app: true
+  
+# Configuración de la aplicación
+app:
+  title: "Obesity Prediction API"
+  description: "Production-ready MLOps API for obesity classification using medical indicators"
+  version: "2.0.0"
+  debug: false
+  reload: false
+  
+# Configuración de CORS
+cors:
+  allow_origins: 
+    - "http://localhost:3000"
+    - "http://localhost:8080"
+    - "https://yourdomain.com"
+  allow_credentials: true
+  allow_methods: ["GET", "POST", "PUT", "DELETE"]
+  allow_headers: ["*"]
+  
+# Configuración de seguridad
+security:
+  trusted_hosts: ["localhost", "127.0.0.1", "yourdomain.com"]
+  api_key_required: false
+  api_key_header: "X-API-Key"
+  rate_limit:
+    requests_per_minute: 100
+    burst_size: 20
+  cors_enabled: true
+  https_only: false
+  
+# Configuración de modelos
+models:
+  primary_model_path: "models/best_model.joblib"
+  feature_pipeline_path: "data/processed/artifacts/feature_pipeline.pkl"
+  model_metadata_path: "models/registered_model_info.json"
+  fallback_model_path: "models/fallback_model.joblib"
+  model_cache_ttl: 3600  # 1 hour
+  
+# Configuración de validación
+validation:
+  # Rangos válidos para features médicas
+  age_range: [14, 100]
+  height_range: [1.20, 2.20]  # metros
+  weight_range: [30, 300]     # kg
+  bmi_range: [10, 60]
+  activity_frequency_range: [0, 3]
+  water_consumption_range: [1, 4]  # litros
+  
+  # Validación de categorías
+  valid_genders: ["Male", "Female"]
+  valid_family_history: ["yes", "no"]
+  valid_favc: ["yes", "no"]  # Frequent high caloric food consumption
+  valid_caec: ["no", "Sometimes", "Frequently", "Always"]  # Between meals
+  valid_smoke: ["yes", "no"]
+  valid_scc: ["yes", "no"]   # Calories consumption monitoring
+  valid_calc: ["no", "Sometimes", "Frequently", "Always"]  # Alcohol
+  valid_transportation: ["Walking", "Bike", "Motorbike", "Public_Transportation", "Automobile"]
+  
+# Configuración de logging
+logging:
+  level: "INFO"
+  format: "json"
+  structured: true
+  include_request_id: true
+  log_predictions: true
+  log_performance: true
+  
+# Configuración de métricas
+metrics:
+  enabled: true
+  endpoint: "/metrics"
+  collect_system_metrics: true
+  collect_model_metrics: true
+  collect_api_metrics: true
+  prometheus_enabled: true
+  
+# Configuración de health checks
+health:
+  endpoint: "/health"
+  detailed_endpoint: "/health/detailed"
+  check_model_loading: true
+  check_memory_usage: true
+  check_disk_space: true
+  memory_threshold: 0.8  # 80%
+  disk_threshold: 0.9    # 90%
+  
+# Configuración de monitoreo
+monitoring:
+  enable_drift_detection: true
+  enable_performance_tracking: true
+  enable_error_tracking: true
+  alert_thresholds:
+    error_rate: 0.05      # 5%
+    response_time_p95: 2000  # 2 seconds
+    memory_usage: 0.8     # 80%
+    
+# Configuración de cache
+cache:
+  enabled: true
+  backend: "memory"  # memory, redis
+  ttl: 300          # 5 minutes
+  max_size: 1000
+  
+# Configuración de middleware
+middleware:
+  request_id: true
+  timing: true
+  compression: true
+  trusted_host: true
+  rate_limiting: true
+  
+# Configuración específica por entorno
+environments:
+  development:
+    server:
+      debug: true
+      reload: true
+      workers: 1
+    security:
+      api_key_required: false
+      rate_limit:
+        requests_per_minute: 1000
+    logging:
+      level: "DEBUG"
+      
+  staging:
+    server:
+      debug: false
+      reload: false
+      workers: 2
+    security:
+      api_key_required: true
+      rate_limit:
+        requests_per_minute: 200
+    logging:
+      level: "INFO"
+      
+  production:
+    server:
+      debug: false
+      reload: false
+      workers: 4
+    security:
+      api_key_required: true
+      https_only: true
+      rate_limit:
+        requests_per_minute: 100
+    logging:
+      level: "WARNING"
+    monitoring:
+      alert_thresholds:
+        error_rate: 0.01      # 1%
+        response_time_p95: 1000  # 1 second

@@ -1,0 +1,38 @@
+# Data Configuration
+data:
+  # Raw data paths
+  raw:
+    source_url: "https://archive.ics.uci.edu/static/public/544/estimation+of+obesity+levels+based+on+eating+habits+and+physical+condition.zip"
+    local_path: "data/raw/ObesityDataSet_raw_and_data_sinthetic.csv"
+  
+  # Processed data paths
+  interim:
+    obesity_original: "data/interim/obesity_estimation_original.csv"
+  
+  processed:
+    train_data: "data/processed/train_data.csv"
+    test_data: "data/processed/test_data.csv"
+
+# Data processing parameters
+processing:
+  # Train/test split
+  test_size: 0.2
+  random_state: 42
+  stratify: true
+  
+  # Feature engineering
+  categorical_encoding: "one_hot"
+  numerical_scaling: "standard"
+  handle_missing: "drop"
+  
+  # Target variable
+  target_column: "NObeyesdad"
+  
+  # Feature columns to exclude
+  exclude_columns: []
+
+# Data quality thresholds
+quality:
+  max_missing_percentage: 0.05
+  min_samples_per_class: 10
+  correlation_threshold: 0.95

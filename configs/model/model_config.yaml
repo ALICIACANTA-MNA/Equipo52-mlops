@@ -1,0 +1,76 @@
+# Model Configuration
+models:
+  random_forest:
+    class_name: "RandomForestClassifier"
+    module: "sklearn.ensemble"
+    hyperparameters:
+      n_estimators: 300
+      max_depth: 12
+      min_samples_split: 2
+      min_samples_leaf: 1
+      max_features: "sqrt"
+      random_state: 42
+      class_weight: "balanced"
+      n_jobs: -1
+    
+  logistic_regression:
+    class_name: "LogisticRegression"
+    module: "sklearn.linear_model"
+    hyperparameters:
+      max_iter: 1000
+      random_state: 42
+      class_weight: "balanced"
+      solver: "liblinear"
+      multi_class: "ovr"
+  
+  svm:
+    class_name: "SVC"
+    module: "sklearn.svm"
+    hyperparameters:
+      kernel: "rbf"
+      C: 1.0
+      gamma: "scale"
+      random_state: 42
+      class_weight: "balanced"
+      probability: true
+
+  gradient_boosting:
+    class_name: "GradientBoostingClassifier"
+    module: "sklearn.ensemble"
+    hyperparameters:
+      n_estimators: 100
+      learning_rate: 0.1
+      max_depth: 3
+      random_state: 42
+
+# Model selection
+model_selection:
+  default_model: "random_forest"
+  evaluation_metric: "f1_weighted"
+  cross_validation:
+    cv_folds: 5
+    scoring: ["accuracy", "f1_weighted", "precision_weighted", "recall_weighted"]
+    
+# Model evaluation
+evaluation:
+  metrics:
+    - "accuracy"
+    - "precision_weighted"
+    - "recall_weighted"
+    - "f1_weighted"
+    - "roc_auc_ovr_weighted"
+  
+  # Performance thresholds
+  thresholds:
+    minimum_accuracy: 0.80
+    minimum_f1_weighted: 0.75
+    
+  # Model comparison
+  compare_models: true
+  save_comparison_plot: true
+
+# Model artifacts
+artifacts:
+  model_path: "models/"
+  metrics_path: "metrics/"
+  plots_path: "plots/"

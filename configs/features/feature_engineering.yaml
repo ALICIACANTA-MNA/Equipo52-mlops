@@ -1,0 +1,185 @@
+# Feature Engineering Configuration
+# Configuración para feature engineering basado en conocimiento del dominio médico
+
+# Features basadas en conocimiento del dominio médico
+domain_features:
+  # Body Mass Index (BMI) - Índice de Quetelet
+  # Referencia: Garrow, J.S. & Webster, J. (1985)
+  create_bmi: true
+  
+  # Categorías BMI según WHO (2000)
+  create_bmi_category: true
+  
+  # Índice de Actividad Física basado en WHO Guidelines (2020)
+  create_activity_index: true
+  
+  # Score de Hábitos Alimenticios basado en cuestionarios dietéticos validados
+  create_eating_habits_score: true
+  
+  # Índice de Hidratación basado en EFSA (2010)
+  create_hydration_index: true
+  
+  # Score de Transporte Activo basado en Bassett et al. (2008)
+  create_transport_activity_score: true
+  
+  # Interacciones médicas basadas en literatura científica
+  create_medical_interactions: true
+  
+  # Flags de riesgo basados en factores médicos establecidos
+  create_risk_flags: true
+
+# Features estadísticas
+statistical_features:
+  # Ratios y proporciones
+  create_ratios: true
+  
+  # Transformaciones logarítmicas para features sesgadas
+  create_log_features: true
+  
+  # Features de agrupación (binning)
+  create_binned_features: true
+
+# Configuración de preprocesamiento
+preprocessing:
+  # Tipo de escalador: 'standard', 'robust'
+  scaler: "standard"
+  
+  # Tipo de encoder: 'onehot', 'label'
+  encoder: "onehot"
+  
+  # Manejar valores faltantes
+  handle_missing: true
+  
+  # Estrategia para imputación
+  imputation_strategy: "median"
+
+# Selección de features
+feature_selection:
+  # Aplicar selección de features
+  enabled: false
+  
+  # Método de selección: 'mutual_info', 'f_classif', 'chi2'
+  method: "mutual_info"
+  
+  # Número de features a seleccionar (o 'all')
+  k_best: "all"
+  
+  # Umbral mínimo de importancia
+  importance_threshold: 0.01
+
+# Validación de features
+validation:
+  # Detectar features constantes
+  detect_constant_features: true
+  
+  # Detectar features con alta correlación
+  detect_high_correlation: true
+  correlation_threshold: 0.95
+  
+  # Verificar distribución de features
+  check_feature_distribution: true
+  
+  # Umbral para features con muchos zeros
+  zero_threshold: 0.9
+
+# Configuración de drift detection para features
+drift_detection:
+  # Habilitar detección de drift en features
+  enabled: true
+  
+  # Dataset de referencia
+  reference_dataset: "data/processed/dataset_limpio.csv"
+  
+  # Umbral para drift
+  drift_threshold: 0.05
+  
+  # Tests estadísticos
+  statistical_tests:
+    - "ks_test"
+    - "psi"
+
+# Configuración de artifacts
+artifacts:
+  # Directorio base
+  base_dir: "artifacts/features"
+  
+  # Guardar pipeline de transformación
+  save_pipeline: true
+  
+  # Guardar metadata de features
+  save_metadata: true
+  
+  # Guardar feature importance
+  save_importance: true
+  
+  # Generar visualizaciones
+  generate_plots: true
+
+# Configuración específica de features médicas
+medical_domain:
+  # Umbrales médicos (basados en literatura científica)
+  bmi_thresholds:
+    underweight: 18.5
+    normal: 25.0
+    overweight: 30.0
+    obese_class_1: 35.0
+    obese_class_2: 40.0
+  
+  # Grupos etarios de riesgo
+  age_groups:
+    young_adult: 25
+    adult: 35
+    middle_age: 45
+    senior: 60
+  
+  # Niveles de actividad física según WHO
+  physical_activity_levels:
+    sedentary: 0.0
+    low: 0.33
+    moderate: 0.67
+    high: 1.0
+  
+  # Recomendaciones de hidratación (litros/día)
+  hydration_recommendations:
+    minimum: 1.5
+    adequate: 2.0
+    optimal: 2.5
+
+# Configuración de MLflow integration
+mlflow_integration:
+  # Habilitar logging en MLflow
+  enabled: true
+  
+  # Experimento para feature engineering
+  experiment_name: "feature_engineering"
+  
+  # Tags por defecto
+  default_tags:
+    stage: "feature_engineering"
+    domain: "healthcare"
+    approach: "domain_knowledge"
+  
+  # Métricas a trackear
+  track_metrics:
+    - "feature_count"
+    - "original_feature_count"
+    - "feature_importance_mean"
+  
+  # Artefactos a guardar
+  log_artifacts:
+    - "feature_pipeline"
+    - "feature_metadata"
+    - "importance_scores"
+
+# Configuración de compatibilidad
+compatibility:
+  # Mantener compatibilidad con código existente
+  preserve_original_output: true
+  
+  # Archivos de salida esperados por pipeline existente
+  legacy_outputs:
+    - "data/features_data.csv"
+    - "models/preprocess.joblib"
+  
+  # Mantener estructura de columnas original donde sea posible
+  preserve_column_order: true

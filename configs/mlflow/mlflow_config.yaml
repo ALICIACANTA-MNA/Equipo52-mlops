@@ -1,0 +1,272 @@
+# ============================================================================
+# MLFLOW CONFIGURATION - Equipo 52 MLOps
+# ============================================================================
+# 
+# FLUJO DE DATOS MLflow:
+# ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+# │   Pipeline      │───▶│   MLflow DB     │───▶│   MLflow UI     │
+# │   (train.py)    │    │   (local + S3)  │    │ (localhost:5000)│
+# └─────────────────┘    └─────────────────┘    └─────────────────┘
+#
+# MLFLOW STORAGE ARCHITECTURE - Separación de Responsabilidades:
+# ┌─────────────────────────────────────────────────────────────────────────┐
+# │                          ALMACENAMIENTO DUAL                            │
+# ├─────────────────────────────────────────────────────────────────────────┤
+# │                                                                         │
+# │  📊 mlflow.db (SQLite)              📁 mlruns/ (Filesystem)            │
+# │  ┌─────────────────────────┐        ┌─────────────────────────┐         │
+# │  │ METADATOS (Rápidos)     │        │ ARTEFACTOS (Grandes)    │         │
+# │  │ • Experimentos          │        │ • Modelos (.pkl)        │         │
+# │  │ • Run IDs               │        │ • Gráficos (.png)       │         │
+# │  │ • Parámetros            │        │ • Reportes (.json)      │         │
+# │  │ • Métricas (valores)    │        │ • Requirements.txt      │         │
+# │  │ • Tags & Timestamps     │        │ • Conda.yaml            │         │
+# │  │ • Estado del modelo     │        │ • MLmodel files         │         │
+# │  └─────────────────────────┘        └─────────────────────────┘         │
+# │                                                                         │
+# │  Lo que ves en MLflow UI        →    Se crea automáticamente            │
+# │  Consultas rápidas (ms)         →    Acceso directo a archivos          │
+# │  Historial completo             →    Artefactos del experimento         │
+# └─────────────────────────────────────────────────────────────────────────┘
+#
+# 🚀 PROCESO DE GUARDADO DE ARTEFACTOS:
+# ┌─────────────────────────────────────────────────────────────────────────┐
+# │  1️⃣  mlflow.start_run()           → Crea entrada en mlflow.db          │
+# │  2️⃣  model.fit(X_train, y_train)  → Entrena modelo en memoria          │
+# │  3️⃣  mlflow.log_param()           → Guarda parámetros en mlflow.db     │
+# │  4️⃣  mlflow.log_metric()          → Guarda métricas en mlflow.db       │
+# │  5️⃣  mlflow.log_artifact()        → CREA mlruns/ + guarda archivo      │
+# │  6️⃣  mlflow.sklearn.log_model()   → GUARDA modelo en mlruns/           │
+# │  7️⃣  plt.savefig() + log_artifact → GUARDA gráfico en mlruns/          │
+# │  8️⃣  mlflow.end_run()             → Finaliza en mlflow.db              │
+# └─────────────────────────────────────────────────────────────────────────┘
+#
+# FUENTES OFICIALES Y BUENAS PRÁCTICAS:
+# ┌─────────────────────────────────────────────────────────────────────────┐
+# │ ¿Por qué "mlruns/" es una buena práctica?                               │
+# ├─────────────────────────────────────────────────────────────────────────┤
+# │                                                                         │
+# │ FUENTES OFICIALES:                                                      │
+# │ • Microsoft Learn MLflow Documentation                                  │
+# │   https://learn.microsoft.com/azure/machine-learning/concept-mlflow     │
+# │ • Azure Databricks MLflow Guide                                         │
+# │   https://learn.microsoft.com/azure/databricks/mlflow/                  │
+# │ • MLflow.org Official Documentation                            │
+# │   https://www.mlflow.org/docs/latest/tracking.html                      │
+# │                                                                         │
+# │ ARQUITECTURA RECOMENDADA (Microsoft Learn):                             │
+# │ • "MLflow uses a consistent set of tools to train and serve models"     │
+# │ • "Artifacts stored separately from tracking metadata for performance"  │
+# │ • "Local filesystem (./mlruns) recommended for development"             │
+# │ • "Remote storage (S3/Azure Blob) recommended for production"           │
+# │                                                                         │
+# │ BENEFICIOS SUSTENTADOS:                                                 │
+# │ 1. SEPARACIÓN DE RESPONSABILIDADES:                                     │
+# │    - Metadatos pequeños → Base de datos (consultas rápidas)             │
+# │    - Archivos grandes → Sistema de archivos (acceso directo)            │
+# │                                                                         │
+# │ 2. ESCALABILIDAD Y RENDIMIENTO:                                         │
+# │    - SQLite/PostgreSQL optimizado para metadatos estructurados          │
+# │    - Filesystem optimizado para almacenamiento de archivos grandes      │
+# │                                                                         │
+# │ 3. CONVENCIÓN ESTÁNDAR DE LA INDUSTRIA:                                 │
+# │    - Usado por Microsoft Azure ML, Databricks, MLflow.org               │
+# │    - Compatible con múltiples proveedores de nube                       │
+# │    - Migración sencilla entre entornos (local ↔ nube)                   │
+# │                                                                         │
+# │ 4. RECUPERACIÓN Y RESPALDO:                                             │
+# │    - mlflow.db → Historial completo de experimentos                     │
+# │    - mlruns/ → Artefactos recuperables independientemente               │
+# │                                                                         │
+# │ COMPATIBILIDAD MULTI-ENTORNO:                                           │
+# │ • Desarrollo: ./mlruns (filesystem local)                               │
+# │ • Colaboración: ./mlruns + sincronización con S3/Azure                  │
+# │ • Producción: s3://bucket/mlruns o azureblob://container/mlruns         │
+# └─────────────────────────────────────────────────────────────────────────┘
+#
+# ALMACENAMIENTO DUAL:
+# - Local: SQLite (mlflow.db) + ./mlruns/ (tracking + artifacts)  
+# - AWS S3: s3://mlflow-artifacts-equipo52/ (backup + colaboración)
+#
+# COMPARTIR CON EQUIPO:
+# 1. Local: Compartir mlflow.db via Git/Drive
+# 2. Remoto: Usar servidor MLflow con S3 backend
+#
+# COMANDOS:
+# - Activar entorno: .venv\Scripts\Activate.ps1
+# - Iniciar UI: python -m mlflow ui --backend-store-uri sqlite:///mlflow.db --host 127.0.0.1 --port 5000
+# ============================================================================
+
+# MLflow Configuration
+mlflow:
+  # Tracking server configuration
+  tracking:
+    # PRIMARY: Local SQLite para desarrollo y testing
+    tracking_uri: "sqlite:///mlflow.db"  # Local SQLite database
+    
+    # ALTERNATIVAS para producción/colaboración:
+    # tracking_uri: "http://localhost:5000"        # Servidor MLflow local
+    # tracking_uri: "postgresql://user:pass@host/db"  # PostgreSQL remoto
+    # tracking_uri: "mysql://user:pass@host/db"       # MySQL remoto
+    
+  # Experiment settings
+  experiment:
+    name: "obesity_prediction_local"  # Cambiado para modo local
+    description: "Obesity level prediction - LOCAL ONLY MODE"
+    tags:
+      project: "Equipo52-mlops"
+      version: "local-v1.0"
+      dataset: "obesity_estimation"
+      storage: "local_only"  # Solo local
+      
+  # Model registry configuration
+  registry:
+    registered_model_name: "obesity_classifier_local"
+    model_stage: "Staging"  # None, Staging, Production, Archived
+    description: "Multi-class obesity classifier - LOCAL ONLY"
+    
+  # ========================================================================
+  # DUAL ARTIFACT STORAGE: Local + AWS S3
+  # ========================================================================
+  artifacts:
+    # PRIMARY: Local storage (rápido, para desarrollo)
+    primary_location: "./mlruns"
+    
+    # SECONDARY: AWS S3 storage (backup, colaboración, producción)
+    secondary_location: "s3://mlflow-artifacts-equipo52/experiments"
+    
+    # Configuración S3 - Usar bucket existente con permisos básicos
+    s3_config:
+      bucket_name: "equipo52-mlops-artifacts"  # Nombre más simple
+      region: "us-east-1"  # Región AWS por defecto
+      prefix: "mlflow/obesity-prediction"
+      
+    # Configuración alternativa para testing (usando bucket público o existente)
+    s3_fallback:
+      enabled: true
+      local_only_mode: true  # Si falla S3, continuar solo local
+      
+    # Configuración de sync (DESHABILITADO para modo local)
+    sync_config:
+      auto_sync: false  # NO sincronizar automáticamente
+      sync_on_completion: false  # NO sync al completar experimento
+      exclude_patterns:  # Archivos a excluir del sync
+        - "*.tmp"
+        - "*.log"
+        - "__pycache__"
+    
+  # Auto-logging
+  autolog:
+    sklearn: true
+    pytorch: false
+    tensorflow: false
+    log_models: true
+    log_input_examples: true
+    log_model_signatures: true
+    
+  # Run configuration
+  run:
+    nested_runs: false
+    run_name_prefix: "obesity_"
+    description_template: "Model training for obesity prediction - {model_type}"
+    
+# Logging configuration
+logging:
+  # Parameters to log
+  log_params:
+    - "model_type"
+    - "test_size"
+    - "random_state"
+    - "cross_validation_folds"
+    
+  # Metrics to log
+  log_metrics:
+    - "accuracy"
+    - "f1_weighted"
+    - "precision_weighted"
+    - "recall_weighted"
+    - "training_time"
+    
+  # Artifacts to log
+  log_artifacts:
+    - "confusion_matrix.png"
+    - "classification_report.json"
+    - "feature_importance.png"
+    - "model_comparison.png"
+    
+  # Tags to add to runs
+  run_tags:
+    environment: "development"
+    data_version: "v1.0"
+    code_version: "main"
+    storage_backend: "hybrid"
+    aws_region: "us-east-1"
+
+# ============================================================================
+# AWS S3 CONFIGURATION - Almacenamiento en la nube
+# ============================================================================
+aws:
+  # Credenciales (usar variables de entorno en producción)
+  credentials:
+    access_key_id: "${AWS_ACCESS_KEY_ID}" 
+    secret_access_key: "${AWS_SECRET_ACCESS_KEY}"
+    region: "us-east-1"
+  
+  # Configuración S3
+  s3:
+    bucket_name: "equipo52-mlops-artifacts"
+    # Estructura de carpetas en S3:
+    # mlflow-artifacts-equipo52/
+    # ├── experiments/
+    # │   ├── obesity_prediction_v4/
+    # │   │   ├── runs/
+    # │   │   ├── models/
+    # │   │   └── artifacts/
+    # └── model_registry/
+    
+    folder_structure:
+      experiments: "experiments"
+      models: "models" 
+      artifacts: "artifacts"
+      model_registry: "model_registry"
+    
+    # Configuración de acceso
+    versioning: true  # Habilitar versionado de objetos
+    encryption: "AES256"  # Encriptación
+    storage_class: "STANDARD"  # STANDARD, STANDARD_IA, GLACIER
+    
+
+# ============================================================================
+# CONFIGURATION PROFILES - Diferentes entornos
+# ============================================================================
+# PERFIL ACTIVO: local_only (cambiar aquí para diferentes modos)
+active_profile: "local_only"
+
+profiles:
+  # 🏠 Perfil SOLO LOCAL (sin AWS) - ACTIVO
+  local_only:
+    tracking_uri: "sqlite:///mlflow.db"
+    artifact_location: "./mlruns"
+    aws_sync: false
+    s3_enabled: false
+    description: "Desarrollo local sin dependencias AWS"
+    
+  # Perfil de desarrollo (solo local) - DEPRECADO, usar local_only
+  development:
+    tracking_uri: "sqlite:///mlflow.db"
+    artifact_location: "./mlruns"
+    aws_sync: false
+    
+  # Perfil de colaboración (local + S3)
+  collaboration:
+    tracking_uri: "sqlite:///mlflow.db"
+    artifact_location: "./mlruns"
+    aws_sync: true
+    s3_backup: true
+    
+  # Perfil de producción (remoto + S3) - PLANTILLA EJEMPLO
+  production:
+    tracking_uri: "postgresql://mlflow:password@prod-server:5432/mlflow"
+    artifact_location: "s3://mlflow-artifacts-equipo52/production"
+    aws_sync: true
+    model_registry_backend: "s3"

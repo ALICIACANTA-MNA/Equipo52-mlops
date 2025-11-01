@@ -1,0 +1,9 @@
+{
+  "timestamp": "2025-10-30T11:20:15.027970",
+  "project": "MLOps Obesity Prediction",
+  "test_environment": "test",
+  "python_version": "3.12.7 | packaged by Anaconda, Inc. | (main, Oct  4 2024, 13:17:27) [MSC v.1929 64 bit (AMD64)]",
+  "reports_generated": [
+    "coverage/"
+  ]
+}

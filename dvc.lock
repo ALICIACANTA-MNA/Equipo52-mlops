@@ -1,0 +1,308 @@
+schema: '2.0'
+stages:
+  data_ingestion:
+    cmd: python -m src.data.data_ingestion
+    deps:
+    - path: configs/data/data_config.yaml
+      hash: md5
+      md5: a5026508726102025dc6368261459add
+      size: 987
+    - path: src/data/data_ingestion.py
+      hash: md5
+      md5: 2df440a486995082ae9ada01f2abb707
+      size: 15729
+    params:
+      params.yaml:
+        data.raw_data_path: data/raw/ObesityDataSet_raw_and_data_sinthetic.csv
+        data.raw_data_url: 
+          https://archive.ics.uci.edu/static/public/544/estimation+of+obesity+levels+based+on+eating+habits+and+physical+condition.zip
+    outs:
+    - path: data/raw/ObesityDataSet_raw_and_data_sinthetic.csv
+      hash: md5
+      md5: 05a6baf4314585e8cb4cfd60fb07a53a
+      size: 277308
+  data_validation:
+    cmd: python -m src.data.data_validation
+    deps:
+    - path: configs/data/data_validation.yaml
+      hash: md5
+      md5: 9c45a847be49cc09fe32aa1e2b61819c
+      size: 3067
+    - path: data/raw/ObesityDataSet_raw_and_data_sinthetic.csv
+      hash: md5
+      md5: 05a6baf4314585e8cb4cfd60fb07a53a
+      size: 277308
+    - path: src/data/data_validation.py
+      hash: md5
+      md5: 1bcd9be333fac4242489dbf8453aa8f1
+      size: 21473
+    outs:
+    - path: data/interim/obesity_estimation_original.csv
+      hash: md5
+      md5: 05a6baf4314585e8cb4cfd60fb07a53a
+      size: 277308
+  data_preprocessing:
+    cmd: python -m src.data.data_preprocessing
+    deps:
+    - path: configs/data/data_config.yaml
+      hash: md5
+      md5: a5026508726102025dc6368261459add
+      size: 987
+    - path: data/interim/obesity_estimation_original.csv
+      hash: md5
+      md5: 05a6baf4314585e8cb4cfd60fb07a53a
+      size: 277308
+    - path: src/data/data_preprocessing.py
+      hash: md5
+      md5: fa5a59c0fbe250b66a281e5c0dae18dc
+      size: 25422
+    params:
+      params.yaml:
+        data_processing.random_state: 42
+        data_processing.target_column: NObeyesdad
+        data_processing.test_size: 0.2
+        data_processing.validation_size: 0.1
+        feature_engineering:
+          categorical_encoding: one_hot
+          numerical_scaling: standard
+          handle_missing: drop
+    outs:
+    - path: data/processed/test_data.csv
+      hash: md5
+      md5: cf8df0c36ba973dec8fb2e48560529e4
+      size: 175804
+    - path: data/processed/train_data.csv
+      hash: md5
+      md5: 3a1cba93b313feccf0c8024958739c18
+      size: 699246
+  feature_engineering:
+    cmd: python -m src.features.feature_engineering
+    deps:
+    - path: configs/data/data_config.yaml
+      hash: md5
+      md5: a5026508726102025dc6368261459add
+      size: 987
+    - path: data/processed/test_data.csv
+      hash: md5
+      md5: cf8df0c36ba973dec8fb2e48560529e4
+      size: 175804
+    - path: data/processed/train_data.csv
+      hash: md5
+      md5: 3a1cba93b313feccf0c8024958739c18
+      size: 699246
+    - path: src/features/feature_engineering.py
+      hash: md5
+      md5: 3da9a729d75265c7acfe1fbb8f1cf7af
+      size: 30426
+    params:
+      params.yaml:
+        feature_engineering:
+          categorical_encoding: one_hot
+          numerical_scaling: standard
+          handle_missing: drop
+    outs:
+    - path: data/processed/X_test_processed.csv
+      hash: md5
+      md5: 826dee30f8d0af2a83d5f0eafbd582e4
+      size: 360361
+    - path: data/processed/X_train_processed.csv
+      hash: md5
+      md5: a75a744ce4d6697876af72ea995aeea2
+      size: 1435293
+    - path: data/processed/y_test.csv
+      hash: md5
+      md5: 4cde6c31da8c42d0df4495076f3132d9
+      size: 1272
+    - path: data/processed/y_train.csv
+      hash: md5
+      md5: f08bf2de55a712c48eed50dbff5db3c6
+      size: 5067
+  model_training:
+    cmd: python -m src.models.train
+    deps:
+    - path: configs/mlflow/mlflow_config.yaml
+      hash: md5
+      md5: 01220554207a60d77d08fa56e3fc175c
+      size: 14578
+    - path: configs/model/model_config.yaml
+      hash: md5
+      md5: 3c42fd24192cc2ab86dd2e0fd0a06915
+      size: 1746
+    - path: data/processed/X_train_processed.csv
+      hash: md5
+      md5: a75a744ce4d6697876af72ea995aeea2
+      size: 1435293
+    - path: data/processed/y_train.csv
+      hash: md5
+      md5: f08bf2de55a712c48eed50dbff5db3c6
+      size: 5067
+    - path: src/models/train.py
+      hash: md5
+      md5: c1af6c7a3b747d32b8646e57cd3cb68d
+      size: 30419
+    params:
+      params.yaml:
+        mlflow:
+          experiment_name: obesity_prediction_v2
+          tracking_uri: sqlite:///mlflow.db
+        model_training:
+          model_type: random_forest
+          hyperparameters:
+            n_estimators: 300
+            max_depth: 12
+            min_samples_split: 2
+            min_samples_leaf: 1
+            max_features: sqrt
+            random_state: 42
+            class_weight: balanced
+            n_jobs: -1
+    outs:
+    - path: metrics/train_metrics.json
+      hash: md5
+      md5: d6f6dea7a362a4b5a7bb1aa3ac98a75c
+      size: 1275
+    - path: models/best_model.joblib
+      hash: md5
+      md5: c1503de1b81a25d47887af294eccff92
+      size: 8493576
+  model_evaluation:
+    cmd: python -m src.models.evaluate
+    deps:
+    - path: configs/model/model_config.yaml
+      hash: md5
+      md5: 3c42fd24192cc2ab86dd2e0fd0a06915
+      size: 1746
+    - path: data/processed/X_test_processed.csv
+      hash: md5
+      md5: 826dee30f8d0af2a83d5f0eafbd582e4
+      size: 360361
+    - path: data/processed/y_test.csv
+      hash: md5
+      md5: 4cde6c31da8c42d0df4495076f3132d9
+      size: 1272
+    - path: models/best_model.joblib
+      hash: md5
+      md5: c1503de1b81a25d47887af294eccff92
+      size: 8493576
+    - path: src/models/evaluate.py
+      hash: md5
+      md5: 60379afdad68dbe787cb1a7f36695897
+      size: 38334
+    params:
+      params.yaml:
+        evaluation:
+          metrics:
+          - accuracy
+          - f1_weighted
+          - precision_weighted
+          - recall_weighted
+          cv_folds: 5
+    outs:
+    - path: metrics/classification_report.json
+      hash: md5
+      md5: ad1e4cfee7fb4a8d05e1357a21e26c31
+      size: 2349
+    - path: metrics/confusion_matrix.png
+      hash: md5
+      md5: 2e7d7ad8e36300d5c68e123e4eae9dfd
+      size: 138777
+    - path: metrics/evaluation_metrics.json
+      hash: md5
+      md5: e9bfbf0399885a549595934333c63756
+      size: 157
+    - path: metrics/feature_importance.png
+      hash: md5
+      md5: 5038d0f1b0cd7e33f8f49820335b842b
+      size: 44483
+  model_comparison:
+    cmd: python -m src.models.compare_models
+    deps:
+    - path: configs/model/model_config.yaml
+      hash: md5
+      md5: 3c42fd24192cc2ab86dd2e0fd0a06915
+      size: 1746
+    - path: data/processed/X_train_processed.csv
+      hash: md5
+      md5: a75a744ce4d6697876af72ea995aeea2
+      size: 1435293
+    - path: data/processed/y_train.csv
+      hash: md5
+      md5: f08bf2de55a712c48eed50dbff5db3c6
+      size: 5067
+    - path: src/models/compare_models.py
+      hash: md5
+      md5: 03716dbd31d716db0a7acec92cc773c4
+      size: 13600
+    params:
+      params.yaml:
+        evaluation:
+          metrics:
+          - accuracy
+          - f1_weighted
+          - precision_weighted
+          - recall_weighted
+          cv_folds: 5
+        model_training:
+          model_type: random_forest
+          hyperparameters:
+            n_estimators: 300
+            max_depth: 12
+            min_samples_split: 2
+            min_samples_leaf: 1
+            max_features: sqrt
+            random_state: 42
+            class_weight: balanced
+            n_jobs: -1
+    outs:
+    - path: metrics/comparison_metrics.json
+      hash: md5
+      md5: 2409af7772feab04973849171f366c99
+      size: 746
+    - path: metrics/model_comparison.json
+      hash: md5
+      md5: b41ea1791dd2db60974de98d6836b7c1
+      size: 8527
+    - path: metrics/model_comparison_plot.png
+      hash: md5
+      md5: b619fdf1370885fcfad789a39307b248
+      size: 331887
+  model_registration:
+    cmd: python -m src.models.model_registration
+    deps:
+    - path: configs/mlflow/mlflow_config.yaml
+      hash: md5
+      md5: 01220554207a60d77d08fa56e3fc175c
+      size: 14578
+    - path: metrics/evaluation_metrics.json
+      hash: md5
+      md5: e9bfbf0399885a549595934333c63756
+      size: 157
+    - path: models/best_model.joblib
+      hash: md5
+      md5: c1503de1b81a25d47887af294eccff92
+      size: 8493576
+    - path: src/models/model_registration.py
+      hash: md5
+      md5: 0903072e2a249d804728f97534c81f2d
+      size: 13108
+    params:
+      params.yaml:
+        evaluation:
+          metrics:
+          - accuracy
+          - f1_weighted
+          - precision_weighted
+          - recall_weighted
+          cv_folds: 5
+        mlflow:
+          experiment_name: obesity_prediction_v2
+          tracking_uri: sqlite:///mlflow.db
+    outs:
+    - path: metrics/comparison_metrics.json
+      hash: md5
+      md5: 35d5de1b5b129dff90a4195b5301930e
+      size: 516
+    - path: models/registered_model_info.json
+      hash: md5
+      md5: 083ec7c2d10e02f86d027b237f61f746
+      size: 408

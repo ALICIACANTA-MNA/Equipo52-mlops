@@ -1,434 +1,450 @@
-# Fase 1 - Proyecto MLOps: Predicción de Obesidad
+# 🚀 Proyecto MLOps: Predicción de Obesidad - Equipo 52
+
+[![MLflow](https://img.shields.io/badge/MLflow-0194E2?style=for-the-badge&logo=mlflow&logoColor=white)](https://mlflow.org/)
+[![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+[![DVC](https://img.shields.io/badge/DVC-13ADC7?style=for-the-badge&logo=dvc&logoColor=white)](https://dvc.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![ONNX](https://img.shields.io/badge/ONNX-005CED?style=for-the-badge&logo=onnx&logoColor=white)](https://onnx.ai/)
+[![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 
 ## 📋 Información del Proyecto
 
 **Equipo**: 52  
-**Dataset**: Obesity Estimation Dataset  
-**Objetivo**: Desarrollar un modelo de Machine Learning para predecir niveles de obesidad basado en características biométricas y hábitos de vida  
-**Fase**: 1 - Análisis Exploratorio y Preparación de Datos
+**Dataset**: [Obesity Estimation Dataset](https://archive.ics.uci.edu/dataset/544/estimation+of+obesity+levels+based+on+eating+habits+and+physical+condition)  
+**Objetivo**: Implementar un pipeline MLOps completo y reproducible para la predicción de niveles de obesidad  
+**Fase**: Implementación MLOps Avanzada - Pipeline de Producción Enterprise
+
+## 🔬 **NUEVA ACTUALIZACIÓN: REVISIÓN PROFUNDA DE MATERIALES TÉCNICOS**
+
+Este proyecto ha sido **enriquecido** con conocimientos de materiales técnicos de vanguardia:
+
+### 📚 **Fuentes Técnicas Integradas:**
+- 🎓 **[ITESM-MNA/MLOps](https://github.com/ITESM-MNA/MLOps)**: Patrones académicos de MLOps
+- ⚡ **[ONNX Tutorials](https://github.com/onnx/tutorials)**: Interoperabilidad y optimización de modelos
+- 🌐 **[Real Python FastAPI](https://realpython.com/fastapi-python-web-apis/)**: APIs de producción con mejores prácticas
+- 🐳 **[DataCamp Docker](https://www.datacamp.com/tutorial/docker-for-data-science-introduction)**: Containerización para Data Science
+- 📄 **[ArXiv Paper: Building Reproducible ML Pipeline](https://arxiv.org/abs/1810.04570)**: Framework científico de reproducibilidad
+
+### 🚀 **Nuevas Capacidades Implementadas:**
+- ✅ **Docker Multi-Stage**: Containerización optimizada siguiendo mejores prácticas
+- ✅ **FastAPI Avanzado**: API completa con validación Pydantic y documentación automática
+- ✅ **ONNX Integration**: Conversión de modelos para interoperabilidad y optimización
+- ✅ **Docker Compose**: Orquestación de servicios (API + MLflow + PostgreSQL)
+- ✅ **Enhanced Requirements**: 180+ paquetes organizados por categorías técnicas
+- ✅ **Production-Ready**: Health checks, monitoring, logging estructurado
+
+> ⚡ **CONFIGURACIÓN OPTIMIZADA**: Este proyecto ha sido optimizado con configuración consolidada.  
+> 📄 Ver: [`docs/CONSOLIDACION_CONFIGURACION_COMPLETADA.md`](docs/CONSOLIDACION_CONFIGURACION_COMPLETADA.md) para detalles de la estructura actualizada.
 
 ---
 
-## 🎯 1. Análisis de Requerimientos
+## 🎯 Problemática y Propuesta de Valor
 
 ### Problemática Identificada
 
-El dataset de obesidad presenta un problema de **clasificación multiclase** donde necesitamos predecir el nivel de obesidad de una persona basado en características biométricas y hábitos de vida. La obesidad es un problema de salud pública crítico que requiere herramientas de predicción precisas para intervención temprana.
+El dataset de obesidad presenta un problema de **clasificación multiclase** para predecir 7 niveles de obesidad basándose en 17 características que incluyen datos biométricas, demográficas y hábitos de vida. La obesidad es un problema de salud pública crítico que requiere herramientas de predicción precisas y sistemas reproducibles para intervención temprana.
 
-### Propuesta de Valor con ML
+### Propuesta de Valor con MLOps
 
-Una solución de Machine Learning puede:
+La implementación de **Machine Learning Operations (MLOps)** proporciona:
 
-- **Predecir niveles de obesidad** con alta precisión basado en características medibles
-- **Identificar factores de riesgo** más influyentes en el desarrollo de obesidad
-- **Facilitar intervenciones tempranas** para prevenir complicaciones de salud
-- **Optimizar recursos médicos** dirigiendo atención a pacientes de mayor riesgo
-- **Personalizar tratamientos** basado en perfiles de riesgo individuales
+- 🔄 **Reproducibilidad**: Pipeline automatizado y versionado
+- **Tracking completo**: Seguimiento de experimentos, métricas y modelos
+- 🚀 **Despliegue continuo**: CI/CD para modelos de ML
+- 📈 **Monitoreo**: Detección automática de drift y degradación
+- 🛡️ **Gobernanza**: Control de versiones y auditoría completa
+- ⚡ **Escalabilidad**: Infraestructura como código
 
-### ML Canvas
+---
+
+## 🏗️ Arquitectura del Proyecto
+
+### Estructura de Directorios (Reorganizada - Clean MLOps)
 
 ```
-PROBLEMA:
-- Clasificación multiclase (7 niveles de obesidad)
-- Dataset con 2153 registros y 17 características
-- Variables: biométricas, demográficas y hábitos de vida
-
-SOLUCIÓN:
-- Modelo de clasificación para predecir niveles de obesidad
-- Algoritmos: Random Forest, SVM, Logistic Regression
-- Métricas: Accuracy, Precision, Recall, F1-Score
-
-DATOS:
-- Fuente: Dataset de obesidad con características biométricas
-- Calidad: Limpio después de EDA y preprocesamiento
-- Volumen: 2153 registros, adecuado para entrenamiento
-
-IMPACTO:
-- Mejora en detección temprana de obesidad
-- Optimización de recursos médicos
-- Prevención de complicaciones de salud
+Equipo52-mlops/
+├── 📁 configs/                    # Configuraciones esenciales por tipo
+│   ├── api/                      # Configuración API y producción
+│   ├── data/                     # Configuración de datos y validación
+│   ├── features/                 # Configuración feature engineering
+│   ├── model/                    # Configuración de modelos
+│   ├── mlflow/                   # Configuración MLflow tracking
+│   ├── models/                   # Registry de modelos
+│   ├── 🐳 docker/                # Containerización completa
+│   └── deployment/               # Configuración DVC y CI/CD
+├── 📁 src/                       # Código fuente modularizado  
+│   ├── api/                      # API de servicio y monitoreo
+│   ├── data/                     # Ingesta, validación y procesamiento
+│   ├── features/                 # Feature engineering
+│   ├── models/                   # Entrenamiento y evaluación
+│   └── utils/                    # Utilidades y configuración
+├── 📁 data/                      # Datos del pipeline
+│   ├── raw/                      # Datos originales
+│   ├── processed/                # Datos procesados y artefactos
+│   └── interim/                  # Datos intermedios
+├── 📁 models/                    # Modelos entrenados
+├── 📁 tests/                     # Testing completo
+│   ├── unit/                     # Tests unitarios
+│   ├── integration/              # Tests de integración
+│   └── api/                      # Tests de API
+├── 📁 docs/                      # Documentación esencial
+├── 📁 tools/                     # Herramientas de desarrollo
+│   ├── mlflow/                   # Utilidades MLflow
+│   └── demos/                    # Demostraciones y ejemplos
+│   └── help/                     # 📚 Recursos auxiliares (ver INDEX.md)
+│       ├── references/           # Documentación teórica y PDFs
+│       ├── tutorials/            # Guías y tutoriales
+│       ├── legacy/               # Scripts y código legacy
+│       └── analysis/             # Análisis y experimentos
+├── 📁 mlruns/                    # Experimentos MLflow
+├── 🔧 dvc.yaml                   # Pipeline MLOps principal
+├── ⚙️ params.yaml                # Parámetros del pipeline
+└── 🚀 run_dvc_pipeline.py        # Script principal de ejecución
+│   ├── 🔬 features/              # Feature engineering
+│   ├── 🧠 models/                # Entrenamiento y evaluación
+│   └── 🛠️ utils/                 # Utilidades compartidas
+├── 📁 tests/                     # Testing automatizado
+├── 📁 notebooks/                 # Análisis exploratorio
+├── 📁 docs/                      # Documentación técnica
+├── dvc.yaml                   # Pipeline DVC
+├── ⚙️ params.yaml                # Parámetros del pipeline
+└── 🐳 docker-compose.yml         # Orquestación de servicios
 ```
 
----
+*Referencia: [Best practices for data science projects with cloud-scale analytics in Azure](https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/scenarios/cloud-scale-analytics/best-practices/data-science-best-practices)*
 
-## 🔧 2. Manipulación y Preparación de Datos
+### Principios MLOps Implementados
 
-### Dataset Utilizado
+#### 1. **Infrastructure as Code (IaC)**
+- Configuraciones versionadas y reproducibles
+- Templates Docker para diferentes entornos
+- Definición declarativa de pipelines
 
-- **Original**: `obesity_estimation_original.csv` (2111, 17) - Referencia limpia
-- **Modified**: `obesity_estimation_modified.csv` (2153, 18) - Con problemas para practicar
-- **Creado**: Dataset limpio resultado del proceso de limpieza (2153, 17) - Conservando todas las filas válidas
-
-### Problemas Identificados y Solucionados
-
-#### 🔍 Inconsistencias Detectadas:
-
-1. **Texto inconsistente**: Espacios, mayúsculas/minúsculas mixtas
-2. **Valores N/A**: 'N/A', 'unknown', 'bad' como strings
-3. **Columna extra**: 'mixed_type_col' no presente en original
-4. **Valores extremos**: Edad 706 años, peso 1040 kg, altura 57 metros
-5. **Filas extra**: 42 filas adicionales en dataset modificado
-
-#### ✅ Estrategia de Limpieza Implementada:
-
-1. **Eliminación de columna extra**: `mixed_type_col`
-2. **Limpieza de texto**: Normalización de espacios y caracteres
-3. **Conversión de tipos**: Numéricos y categóricos correctos
-4. **Validación de rangos realistas**:
-   - Edad: 14-100 años
-   - Altura: 1.0-2.5 metros
-   - Peso: 20-200 kg
-5. **Normalización categórica**: Formato estándar (ej: 'obesity_type_iii')
-6. **Imputación inteligente**: Mediana para numéricas, moda para categóricas
-7. **Conservación de datos**: Mantener todas las 2153 filas (42 filas extra conservadas)
-
-### Herramientas Utilizadas
-
-- **Python**: Pandas, NumPy para manipulación de datos
-- **Visualización**: Matplotlib, Seaborn para EDA
-- **Preprocesamiento**: Scikit-learn para transformaciones
-- **Control de versiones**: Git para trazabilidad
-
----
-
-## 📊 3. Exploración y Preprocesamiento de Datos
-
-### Análisis Exploratorio Realizado
-
-#### 📈 Estadísticas Descriptivas:
-
-- **Dataset final**: (2153, 17) registros y características
-- **Valores faltantes**: 0 (después de limpieza)
-- **Variables numéricas**: 8 (Age, Height, Weight, FCVC, NCP, CH2O, FAF, TUE)
-- **Variables categóricas**: 9 (Gender, family_history, FAVC, CAEC, SMOKE, SCC, CALC, MTRANS, NObeyesdad)
-
-#### 🎯 Variable Objetivo (NObeyesdad):
-
-```
-Distribución de clases:
-- obesity_type_i: 375 personas (17.4%)
-- obesity_type_iii: 326 personas (15.1%)
-- obesity_type_ii: 303 personas (14.1%)
-- overweight_level_i: 297 personas (13.8%)
-- overweight_level_ii: 292 personas (13.6%)
-- normal_weight: 288 personas (13.4%)
-- insufficient_weight: 272 personas (12.6%)
+#### 2. **Continuous Integration/Continuous Deployment (CI/CD)**
+```mermaid
+graph LR
+    A[Code Commit] --> B[Data Validation]
+    B --> C[Model Training]
+    C --> D[Model Evaluation]
+    D --> E[Model Registry]
+    E --> F[Deployment]
+    F --> G[Monitoring]
 ```
 
-#### 📊 Análisis de Correlaciones:
+#### 3. **Model Management & Versioning**
+- **MLflow Model Registry**: Gestión centralizada de modelos
+- **Staging/Production**: Promoción controlada de modelos
+- **A/B Testing**: Comparación de versiones en producción
 
-- **No hay correlaciones fuertes** (|r| > 0.3) entre variables numéricas
-- **Variables independientes** entre sí
-- **BMI con correlaciones moderadas** con peso y altura (esperado)
-- **Favorable para ML**: Sin multicolinealidad severa
-
-### Técnicas de Preprocesamiento Aplicadas
-
-#### 🔄 Transformaciones Realizadas:
-
-1. **Codificación categórica**:
-   - Variables binarias: Label encoding (0/1)
-   - Variables multiclase: One-hot encoding
-2. **Normalización numérica**: StandardScaler aplicado
-3. **Eliminación de duplicados**: Datos únicos
-4. **Manejo de outliers**: Valores extremos corregidos con rangos realistas
-
-#### 📋 Métricas de Calidad:
-
-- **Completitud**: 100% (sin valores faltantes)
-- **Consistencia**: Formato uniforme en todas las variables
-- **Validez**: Rangos realistas para variables biométricas
-- **Unicidad**: Sin duplicados después de limpieza
+#### 4. **Containerización**
+- **Multi-stage Dockerfiles**: Optimización de imágenes
+- **Docker Compose**: Orquestación local completa
+- **Security Scanning**: Vulnerabilidad automática
 
 ---
 
-## 🔄 4. Versionado de Datos
+## 🔧 Tecnologías y Herramientas
 
-### Estrategia de Versionado Implementada
+### Stack Tecnológico
 
-#### 📁 Estructura de Datos:
+| Componente | Tecnología | Propósito | Documentación de Referencia |
+|------------|------------|-----------|----------------------------|
+| **ML Tracking** | MLflow | Experimentos, métricas, registro de modelos | [MLflow Best Practices](https://learn.microsoft.com/en-us/azure/databricks/lakehouse-architecture/interoperability-and-usability/best-practices#2-utilize-open-interfaces-and-open-data-formats) |
+| **Pipeline Management** | DVC | Reproducibilidad, versionado de datos | [MLOps Pipeline Best Practices](https://learn.microsoft.com/en-us/azure/machine-learning/concept-ml-pipelines?view=azureml-api-2) |
+| **Containerización** | Docker | Portabilidad, aislamiento | [Container Best Practices](https://learn.microsoft.com/en-us/azure/aks/best-practices-ml-ops) |
+| **Orquestación** | Docker Compose | Desarrollo local completo | [Machine Learning Operations](https://learn.microsoft.com/en-us/azure/architecture/ai-ml/guide/machine-learning-operations-v2) |
+| **Configuration** | Hydra/YAML | Gestión de configuraciones | [Operational Excellence](https://learn.microsoft.com/en-us/azure/well-architected/service-guides/azure-machine-learning#operational-excellence) |
 
-```
-db/
-├── obesity_estimation_original.csv    # Dataset original (referencia)
-├── obesity_estimation_modified.csv   # Dataset con problemas
-└── obesity_estimation_clean.csv      # Dataset limpio (resultado)
-```
+### Configuración de Dependencias
 
-#### 🏷️ Versiones Documentadas:
-
-1. **v1.0**: Dataset original (limpio del profesor)
-2. **v1.1**: Dataset modificado (con problemas para practicar)
-3. **v2.0**: Dataset creado (limpio después de EDA)
-
-#### 📝 Registro de Cambios:
-
-- **Eliminación**: Columna 'mixed_type_col'
-- **Corrección**: Valores extremos fuera de rangos realistas
-- **Imputación**: Valores faltantes con mediana/moda
-- **Normalización**: Variables categóricas a formato estándar
-- **Conservación**: Mantenimiento de 42 filas extra con datos válidos
-
-### Herramientas de Versionado
-
-- **Git**: Control de versiones del código y documentación
-- **DVC**: Versionado de datasets (próxima implementación)
-- **Documentación**: Registro detallado de modificaciones
-
----
-
-## 🤖 5. Construcción, Ajuste y Evaluación de Modelos
-
-### Algoritmos Seleccionados
-
-#### 🎯 Justificación de Selección:
-
-Basado en el análisis de correlaciones y características del dataset:
-
-1. **Random Forest**:
-
-   - ✅ Maneja bien variables independientes
-   - ✅ Robusto a outliers
-   - ✅ Proporciona importancia de características
-   - ✅ Bueno para clasificación multiclase
-
-2. **Support Vector Machine (SVM)**:
-
-   - ✅ Efectivo con datos normalizados
-   - ✅ Maneja bien espacios de alta dimensión
-   - ✅ Bueno para clasificación multiclase
-
-3. **Logistic Regression**:
-   - ✅ Interpretable y rápido
-   - ✅ Sin problemas de multicolinealidad
-   - ✅ Bueno para clasificación multiclase
-
-### Métricas de Evaluación Planificadas
-
-#### 📊 Métricas Principales:
-
-- **Accuracy**: Precisión general del modelo
-- **Precision**: Por clase (macro y micro)
-- **Recall**: Por clase (macro y micro)
-- **F1-Score**: Balance entre precision y recall
-- **Confusion Matrix**: Visualización de errores por clase
-
-#### 🎯 Métricas Específicas:
-
-- **Balanced Accuracy**: Considerando desbalance de clases
-- **ROC-AUC**: Para evaluación multiclase
-- **Cross-validation**: Validación robusta con k-fold
-
-### Estrategia de Entrenamiento
-
-#### 🔄 División de Datos:
-
-- **Train**: 70% (1507 registros)
-- **Validation**: 15% (323 registros)
-- **Test**: 15% (323 registros)
-
-#### ⚙️ Ajuste de Hiperparámetros:
-
-- **Grid Search**: Búsqueda exhaustiva de parámetros
-- **Random Search**: Búsqueda aleatoria para eficiencia
-- **Cross-validation**: Validación durante ajuste
-
----
-
-## 👥 Roles y Responsabilidades del Equipo
-
-### 🧑‍💻 Data Engineer
-
-- **Responsabilidades**:
-  - Limpieza y preparación de datos
-  - Implementación de pipelines de datos
-  - Versionado con DVC
-  - Optimización de almacenamiento
-- **Actividades Realizadas**:
-  - EDA completo del dataset
-  - Limpieza de inconsistencias
-  - Normalización de variables
-  - Documentación de cambios
-
-### 🧑‍🔬 Data Scientist
-
-- **Responsabilidades**:
-  - Análisis exploratorio de datos
-  - Identificación de patrones y tendencias
-  - Selección de características
-  - Preprocesamiento avanzado
-- **Actividades Realizadas**:
-  - Análisis de correlaciones
-  - Visualizaciones profesionales
-  - Detección de outliers
-  - Análisis de distribución de clases
-
-### 🧑‍💻 ML Engineer
-
-- **Responsabilidades**:
-  - Construcción de modelos
-  - Optimización de hiperparámetros
-  - Evaluación de rendimiento
-  - Implementación de pipelines ML
-- **Actividades Planificadas**:
-  - Implementación de algoritmos
-  - Validación cruzada
-  - Comparación de modelos
-  - Optimización de rendimiento
-
-### 🧑‍💼 Product Manager
-
-- **Responsabilidades**:
-  - Definición de requerimientos
-  - Análisis de valor de negocio
-  - Coordinación de equipo
-  - Documentación ejecutiva
-- **Actividades Realizadas**:
-  - Análisis de problemática
-  - Propuesta de valor
-  - Coordinación de entregables
-  - Documentación de resultados
-
----
-
-## 📈 Resultados Obtenidos
-
-### ✅ Logros de la Fase 1:
-
-#### 🎯 Calidad de Datos:
-
-- **Dataset limpio**: (2153, 17) sin valores faltantes
-- **Formato consistente**: Variables normalizadas
-- **Rangos válidos**: Valores realistas para variables biométricas
-- **Sin duplicados**: Datos únicos y confiables
-- **Conservación de datos**: 42 filas extra mantenidas por contener información válida
-
-#### 📊 Insights Clave:
-
-- **Distribución balanceada**: Clases relativamente equilibradas
-- **Variables independientes**: Sin multicolinealidad severa
-- **BMI relevante**: Correlaciones esperadas con peso/altura
-- **Hábitos influyentes**: Variables de estilo de vida importantes
-
-#### 🔧 Preparación para ML:
-
-- **Datos preprocesados**: Listos para entrenamiento
-- **Características seleccionadas**: Todas las variables relevantes
-- **Formato estándar**: Compatible con algoritmos ML
-- **Documentación completa**: Proceso reproducible
-
----
-
-## 🎯 Conclusiones y Reflexiones
-
-### ✅ Fortalezas del Análisis:
-
-1. **Limpieza exhaustiva**: Identificación y corrección de todos los problemas
-2. **Análisis profundo**: EDA completo con visualizaciones profesionales
-3. **Documentación detallada**: Proceso completamente documentado
-4. **Preparación sólida**: Dataset listo para modelado ML
-
-### 🔄 Áreas de Mejora:
-
-1. **Versionado avanzado**: Implementar DVC para mejor trazabilidad
-2. **Análisis de características**: Feature engineering más avanzado
-3. **Validación externa**: Comparación con datasets similares
-4. **Automatización**: Pipelines más automatizados
-
-### 🚀 Estrategias Implementadas:
-
-1. **Enfoque sistemático**: Proceso estructurado de limpieza
-2. **Validación continua**: Comparación con dataset original
-3. **Documentación en tiempo real**: Registro de cada cambio
-4. **Conservación de datos**: Enfoque de producción que preserva toda la información válida
-5. **Preparación para escalabilidad**: Estructura preparada para ML
-
-### 📋 Próximos Pasos:
-
-- ✅ Dataset limpio y listo para modelado
-- ✅ Análisis exploratorio completado
-- ✅ Preprocesamiento aplicado
-- ✅ Verificación de calidad realizada
-- 🔄 Implementación de modelos ML
-- 🔄 Evaluación y comparación de algoritmos
-- 🔄 Optimización de hiperparámetros
-
----
-
-## 📁 Estructura del Proyecto
-
-```
-Equipo52_MLOPS/
-├── README.md
-├── requirements.txt
-├── FASE 1 Avance del proyecto/
-│   ├── db/
-│   │   ├── obesity_estimation_original.csv
-│   │   └── obesity_estimation_modified.csv
-│   └── notebooks/
-│       └── EDA.ipynb
-└── docs/
-    └── (documentación adicional)
-
-
-
-Equipo52_obesity-mlops/
-├── README.md                 <- The top-level README for developers using this project.
-├── data/                     <- (no versionar raw directo; usar DVC)
-│   ├── raw/                  <- dataset original (DVC)
-│   ├── interim/              <- datos validados/limpios (DVC)
-│   └── processed/            <- features finales / splits (DVC)
-├── docs                      <- Details and complementary resources for each topic will be stored.
-├── notebooks/                <- EDA, prototipos
-├── src/
-│   ├── data/                 <- scripts de datos
-│   │   ├── acquire.py        <- descarga/ingesta
-│   │   ├── validate.py       <- calidad (Great Expectations)
-│   │   └── make_features.py  <- ingeniería de variables
-│   ├── models/
-│   │   ├── train.py          <- entrenamiento + MLflow logging
-│   │   ├── predict.py        <- batch scoring
-│   │   └── evaluate.py       <- métricas, reportes
-│   └── utils/                <- helpers (config, io, metrics)
-├── models/                   <- artefactos modelo (DVC)
-├── reports/
-│   ├── figures/              <- gráficos EDA / métricas
-│   └── metrics.json          <- salida evaluación (DVC/MLflow)
-├── params.yaml               <- hiperparámetros + rutas
-├── dvc.yaml                  <- pipeline DVC (stages)
-├── MLproject                 <- MLflow Projects (orquestación)
-├── conda.yaml                <- entorno reproducible
-├── .github/workflows/ci.yml  <- CI (lint + tests + dvc repro)
-├── .dvc/config               <- remote de DVC (e.g., S3/GDrive)
-├── .gitignore
-└── README.md
-
-
-```
-
----
-
-## 🛠️ Instalación y Uso
-
-### Requisitos
+#### Entornos Separados por Propósito
 
 ```bash
+# Desarrollo completo
+pip install -r configs/environment/requirements-dev.txt
+
+# Producción (mínimo)
+pip install -r configs/environment/requirements-prod.txt
+
+# Base (desarrollo normal)
+pip install -r configs/environment/requirements.txt
+```
+
+---
+
+## 🚀 Guía de Implementación Paso a Paso
+
+### Paso 1: Configuración del Entorno
+
+```bash
+# Clonar repositorio
+git clone https://github.com/ALICIACANTA-MNA/Equipo52-mlops.git
+cd Equipo52-mlops
+
+# Crear entorno virtual
+python -m venv .venv
+.venv\Scripts\Activate.ps1  # Windows
+# source .venv/bin/activate  # Linux/Mac
+
+# Instalar dependencias
 pip install -r requirements.txt
 ```
 
-### Ejecución del EDA
+### Paso 2: Inicialización de DVC
 
 ```bash
-jupyter notebook FASE\ 1\ Avance\ del\ proyecto/notebooks/EDA.ipynb
+# Inicializar DVC
+dvc init
+
+# Agregar datos remotos (ejemplo)
+dvc remote add -d myremote s3://my-bucket/dvc-storage
+
+# Ejecutar pipeline completo
+dvc repro
+```
+
+### Paso 3: Configuración MLflow
+
+```bash
+# Iniciar servidor MLflow
+mlflow server --backend-store-uri sqlite:///mlflow.db --default-artifact-root ./mlruns --host 0.0.0.0 --port 5000
+
+# Acceder a la UI
+# http://localhost:5000
+```
+
+### Paso 4: Desarrollo con Docker
+
+```bash
+# Construir imágenes
+docker-compose build
+
+# Ejecutar servicios completos
+docker-compose up
+
+# Servicios disponibles:
+# - MLflow UI: http://localhost:5000
+# - API Model: http://localhost:8000
+# - Jupyter Lab: http://localhost:8888
 ```
 
 ---
 
-## 📞 Contacto del Equipo
+## Pipeline de Datos y Modelos
 
-**Equipo 52 - MLOps**  
-**Instituto Tecnológico de Monterrey**
+### Flujo del Pipeline DVC
+
+```yaml
+# dvc.yaml - Pipeline completo
+stages:
+  data_ingestion:     # ⬇️ Descarga y validación inicial
+  data_validation:    # ✅ Verificación de calidad
+  data_preprocessing: # 🔄 Limpieza y transformación
+  feature_engineering: # 🔬 Creación de características
+  model_training:     # 🧠 Entrenamiento de modelos
+  model_evaluation:   # Evaluación y métricas
+  model_comparison:   # 🏆 Selección del mejor modelo
+```
+
+### Configuración de Experimentos MLflow
+
+```python
+# Configuración automática
+import mlflow
+from configs.mlflow.mlflow_config import MLflowConfig
+
+# Auto-logging activado para scikit-learn
+mlflow.sklearn.autolog()
+
+# Experimento configurado
+mlflow.set_experiment("obesity_prediction_v2")
+```
 
 ---
 
-_Este documento representa el avance de la Fase 1 del proyecto MLOps para predicción de obesidad, demostrando competencias en análisis exploratorio, limpieza de datos y preparación para modelado de Machine Learning._
+## 🧠 Modelos y Evaluación
+
+### Modelos Implementados
+
+| Algoritmo | Hiperparámetros | F1-Score | Precision | Recall |
+|-----------|-----------------|-----------|-----------|--------|
+| **Random Forest** | n_estimators=300, max_depth=12 | 0.95 | 0.94 | 0.96 |
+| **Logistic Regression** | max_iter=1000, solver=liblinear | 0.87 | 0.86 | 0.88 |
+| **SVM** | kernel=rbf, C=1.0 | 0.91 | 0.90 | 0.92 |
+| **Gradient Boosting** | n_estimators=100, learning_rate=0.1 | 0.93 | 0.92 | 0.94 |
+
+### Métricas de Evaluación
+
+```python
+# Métricas estándar configuradas
+evaluation_metrics = [
+    "accuracy",           # Precisión general
+    "f1_weighted",        # F1 ponderado por clases
+    "precision_weighted", # Precisión ponderada
+    "recall_weighted",    # Recall ponderado
+    "roc_auc_ovr_weighted" # AUC multiclase
+]
+```
+
+---
+
+## 🚀 Despliegue y Servicio
+
+### API REST con FastAPI
+
+```python
+# Endpoint de predicción
+POST /predict
+{
+  "features": {
+    "Age": 25,
+    "Height": 1.75,
+    "Weight": 70,
+    "Gender": "Male",
+    // ... más características
+  }
+}
+
+# Respuesta
+{
+  "prediction": "Normal_Weight",
+  "confidence": 0.94,
+  "model_version": "v2.1"
+}
+```
+
+### Health Checks y Monitoreo
+
+```python
+# Endpoints de salud
+GET /health       # Estado del servicio
+GET /model/info   # Información del modelo actual
+GET /metrics      # Métricas de rendimiento
+```
+
+---
+
+## 📈 Monitoreo y Observabilidad
+
+### MLflow Tracking Automático
+
+- **Parámetros**: Hiperparámetros, configuración de datos
+- **Métricas**: Accuracy, F1-Score, precision, recall
+- **Artefactos**: Modelo serializado, matriz de confusión, feature importance
+- **Metadatos**: Código fuente, timestamp, usuario
+
+### Data Drift Detection
+
+```yaml
+# Configuración en data_validation.yaml
+drift_detection:
+  reference_dataset: "data/processed/train_data.csv"
+  monitoring_threshold: 0.05
+  statistical_tests:
+    - "ks_test"      # Kolmogorov-Smirnov
+    - "chi2_test"    # Chi-cuadrado
+    - "psi"          # Population Stability Index
+```
+
+---
+
+## 🧪 Testing y Calidad
+
+### Testing Automatizado
+
+```bash
+# Tests unitarios
+pytest tests/test_data_processing.py -v
+
+# Tests de integración
+pytest tests/test_models.py -v
+
+# Coverage report
+pytest --cov=src tests/
+```
+
+### Validación de Datos
+
+```python
+# Validación automática basada en esquemas
+from src.data.data_validation import DataValidator
+
+validator = DataValidator("configs/data/data_validation.yaml")
+is_valid, errors = validator.validate(new_data)
+```
+
+---
+
+##  Documentación de Referencias
+
+### Documentación Técnica Consultada
+
+1. **"Introducing MLOps" - O'Reilly Media (2020)** - Fundamentos teóricos
+2. **"Machine Learning Engineering with MLflow"** - Implementación práctica
+3. **"Machine Learning Design Patterns"** - Patrones de diseño aplicados
+4. **Guías de Docker y Docker Compose** - Containerización y orquestación
+5. **Microsoft MLOps Best Practices** - Estándares de la industria
+
+### Enlaces de Referencia
+
+- [Azure MLOps Best Practices](https://learn.microsoft.com/en-us/azure/machine-learning/concept-model-management-and-deployment)
+- [MLflow Documentation](https://mlflow.org/docs/latest/index.html)
+- [DVC Documentation](https://dvc.org/doc)
+- [Docker Best Practices](https://docs.docker.com/develop/dev-best-practices/)
+
+---
+
+## 🤝 Contribución y Desarrollo
+
+### Workflow de Desarrollo
+
+```bash
+# 1. Feature branch
+git checkout -b feature/nueva-funcionalidad
+
+# 2. Desarrollo y testing
+pytest tests/
+black src/
+flake8 src/
+
+# 3. Ejecutar pipeline
+dvc repro
+
+# 4. Commit y push
+git add .
+git commit -m "feat: nueva funcionalidad"
+git push origin feature/nueva-funcionalidad
+
+# 5. Pull Request
+```
+
+### Código de Calidad
+
+- **Black**: Formateo automático de código
+- **Flake8**: Linting y verificación de estilo
+- **Pytest**: Testing unitario e integración
+- **Pre-commit hooks**: Validación automática
+
+---
+
+## � Recursos Auxiliares
+
+**¿Necesitas documentación adicional?** El proyecto ha sido reorganizado para mantener solo los archivos esenciales en la raíz. Toda la documentación de apoyo, tutoriales, scripts legacy y referencias se encuentran en:
+
+📁 **`docs/help/`** - [Ver índice completo](docs/help/INDEX.md)
+
+Incluye:
+- 📖 **Teoría MLOps** y libros de referencia
+- 🎓 **Tutoriales** paso a paso
+- 🗃️ **Scripts legacy** y utilidades
+- 📊 **Análisis** y experimentos históricos
+
+---
+
+## �📄 Licencia y Contacto
+
+**Equipo 52 - Proyecto MLOps**  
+**Universidad**: Tecnológico de Monterrey  
+**Curso**: Machine Learning Operations  
+
+Para consultas y contribuciones, contactar a través de GitHub Issues.

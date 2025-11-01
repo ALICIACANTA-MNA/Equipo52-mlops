@@ -1,0 +1,36 @@
+version: '3.8'
+
+networks:
+  mlops-network:
+    driver: bridge
+
+volumes:
+  model-data:
+    driver: local
+
+services:
+  # Obesity Prediction API
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: obesity_api
+    ports:
+      - "8080:8000"
+    volumes:
+      - model-data:/app/models
+      - ./models:/app/models:ro
+      - ./logs:/app/logs
+    environment:
+      - PYTHONPATH=/app
+      - LOG_LEVEL=INFO
+      - MODEL_PATH=/app/models
+    networks:
+      - mlops-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
