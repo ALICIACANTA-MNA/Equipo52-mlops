@@ -23,7 +23,8 @@
 
 2. **Instalar dependencias:**
    ```bash
-   pip install --upgrade pip
+   #pip install --upgrade pip
+   python -m pip install --upgrade pip
    pip install --upgrade pip setuptools wheel build
    pip install -r requirements.txt
    ```
